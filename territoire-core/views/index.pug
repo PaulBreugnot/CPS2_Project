@@ -1,0 +1,25 @@
+extends layout
+
+block header
+  .header
+    #logoHeader
+      img(src='/images/'+logo, align='left', width='80px', height='70px')
+    #titleHeader #{title} --> #{solution}
+    #descriptionHeader
+      #logout 
+      #place for #{place}    
+    
+block maincontent
+  .maincontent
+    #menu
+      ul
+        each val, index in onglets
+          li: img(src='/images/'+val, id=index, align='left', width='45px', height='38px', onclick='load_tab(this)')
+    #map
+    #status <b>Entity information</b> <br />      
+      #statusselect Selected <br />
+      #statushover Hovered <br />
+    
+block footer
+  .footer
+    p Institut Fayol @ École des Mines de Saint-Étienne - Inspiring innovation

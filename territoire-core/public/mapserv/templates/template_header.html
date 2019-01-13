@@ -1,0 +1,35 @@
+<!-- MapServer Template -->
+<html>
+<head>
+  <title>Mapserver Template</title>
+  <script type="text/javascript">
+function zoomIn()
+{
+    console.log('zoomIn call');
+}
+
+function zoomOut()
+{
+    console.log('zoomOut call');
+}
+
+function reset()
+{
+    console.log('reset call');
+    window.location.assign("http://localhost:1025/cgi-bin/mapserv.exe?map=C:/MS4W/ms4w/apps/gis/mapfile.map")
+}
+
+function switchRegionVisibility()
+{
+    console.log('switchRegionVisibility call');
+    window.location.assign("http://localhost:1025/cgi-bin/mapserv.exe?map=C:/MS4W/ms4w/apps/gis/mapfile.map")
+}
+
+function changeMapSize()
+{
+    console.log('changeMapSize call');
+    window.location.assign("http://localhost:1025/cgi-bin/mapserv.exe?map=C:/MS4W/ms4w/apps/gis/mapfile.map&map_size=800+400")
+}
+</script>
+</head> 
+<body bgcolor="#ffffff">
