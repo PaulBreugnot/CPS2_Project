@@ -41,8 +41,8 @@ function createMapBase(spec)
 
 function createMap(elt_base,elt_div,center,tabext,baseview)
 {
-    var minZ = 10;
-    var maxZ = 19;
+    var minZ = 19;
+    var maxZ = 21;
     var zoomZ = baseview;
     var valcenter = ol.proj.transform(center, 'EPSG:4326', 'EPSG:3857');
     var valextent = ol.extent.applyTransform(tabext, ol.proj.getTransform("EPSG:4326", "EPSG:3857"));
@@ -62,7 +62,8 @@ function createMap(elt_base,elt_div,center,tabext,baseview)
 	    center: valcenter,
 	    //[5.38035,43.30937] Marseille
 	    //[4.38833,45.43656] Saint-Etienne
-	    zoom: zoomZ,
+		zoom: zoomZ,
+		rotation: -0.35,
 	    minZoom: minZ,
 	    maxZoom: maxZ,
 	    extent: valextent,
