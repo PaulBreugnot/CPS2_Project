@@ -1,0 +1,29 @@
+<template>
+    <div id="menuScrolling">
+        <MenuScrolling msg="Welcome to Your Vue.js App" />
+    </div>
+</template>
+
+<script>
+    import MenuScrolling from './components/MenuScrolling.vue'
+
+    export default {
+        name: 'menuScrolling',
+        components: {
+            MenuScrolling
+        }
+    }
+
+</script>
+
+<style>
+    #menuScrolling {
+        font-family: 'Avenir', Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-align: center;
+        color: #2c3e50;
+        margin-top: 60px;
+    }
+
+</style>

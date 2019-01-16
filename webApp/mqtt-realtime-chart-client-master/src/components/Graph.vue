@@ -4,9 +4,9 @@
             <div class="row text-center">
 
                 <!-- Panel div start -->
-                <div class="col-xs-12 col-lg-4 col-lg-offset-4">
+                <!--                <div class="col-xs-12 col-lg-4 col-lg-offset-4">
                     <img src="../assets/logo.png" width="100" height="100">
-                </div>
+                </div>-->
 
                 <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-4">
                     <h1>Status: {{connStatus}}</h1>
@@ -27,10 +27,7 @@
                         <div class="panel-footer">
                             <p v-if="displayedValues.length > 0">
                                 <small>
-                                    <span v-bind:style="{ color: dvColors.v1}">{{displayedValues[0].v1}} </span>V
-                                    | <span v-bind:style="{ color: dvColors.v2}">{{displayedValues[0].v2}} </span>V
-                                    | <span v-bind:style="{ color: dvColors.v3}">{{displayedValues[0].v3}} </span>V
-                                    | <span v-bind:style="{ color: dvColors.v4}">{{displayedValues[0].v4}} </span>V
+                                    <span v-bind:style="{ color: dvColors.v1}">{{displayedValues[0].v1}} </span> ℃
                                 </small>
                             </p>
                         </div>
@@ -39,7 +36,7 @@
 
                     <!-- Range slider chart-refresh control -->
                     <div class="col-xs-6 col-xs-offset-3 col-md-6 col-md-offset-3 col-lg-8 col-lg-offset-2">
-                        <input v-model="renderEveryNth" type="range" min="1" max="20" value="5">
+                        <input v-model="renderEveryNth" type="range" min="1" max="20" value="1">
                         <p>Render after <strong>{{renderEveryNth}}</strong> message(s)</p>
                     </div>
                     <!-- End of range slider -->
@@ -52,7 +49,6 @@
 <script>
     import io from 'socket.io-client'
     import Rickshaw from 'rickshaw'
-    import Tree from 'vuejs-tree'
     import 'rickshaw/rickshaw.min.css'
     import 'bootstrap/dist/css/bootstrap.css'
     //var socket = io.connect("http://ec2-54-236-113-5.compute-1.amazonaws.com:9001");
@@ -70,66 +66,28 @@
         });
     });
 
+    var mini;
+    var maxi;
+
     const main = {
-        name: 'home',
+        name: 'graph',
         data() {
             return {
                 messageSeries: [],
-                renderEveryNth: 5,
+                renderEveryNth: 1,
                 updateInterval: 20,
                 streamFrequency: 50,
                 connStatus: "Disconnected",
                 messageIndex: 0,
                 displayedValues: [],
                 dvColors: {
-                    v1: "#cb503a",
-                    v2: "#72c039",
-                    v3: "#65b9ac",
-                    v3: "#35ccac"
-                },
-                treeDisplayData: [{
-                        id: 1,
-                        text: 'Root 1',
-                        definition: 'First node',
-                        depth: 1,
-                        checkable: false,
-                        selectable: false,
-                        expandable: true,
-                        disabled: false,
-                        tags: [42],
-                        state: {
-                            checked: false,
-                            expanded: false,
-                            selected: false
-                        },
-                        nodes: [{
-                                text: 'Child 1',
-                                nodes: [{
-                                        text: 'Grandchild 1'
-                                    },
-                                    {
-                                        text: 'Grandchild 2'
-                                    }
-                                ]
-                            },
-                            {
-                                text: 'Child 2'
-                            }
-                        ]
-                    },
-                    {
-                        text: 'Root 2'
-                    }
-                ]
+                    v1: "#cb503a"
+                }
             }
-        },
-        components: {
-            'tree': Tree
         },
         mounted() {
             this.initChart();
             this.openSocketListeners();
-            this.getTree("my-tree-id");
         },
         watch: {
             renderEveryNth: function() {
@@ -138,11 +96,6 @@
             }
         },
         methods: {
-            getTree: function(treeId) {
-                for (var i = 0; i <= this.$children.length - 1; i++) {
-                    if (this.$children[i].$props.id == treeId) return this.$children[i]
-                }
-            },
             /* Rickshaw.js initialization */
             initChart() {
                 magnitudeChart = new Rickshaw.Graph({
@@ -150,8 +103,8 @@
                     width: "500",
                     height: "180",
                     renderer: "line",
-                    min: 220,
-                    max: 260,
+                    min: 0,
+                    max: 0,
                     series: new Rickshaw.Series.FixedDuration([{
                         name: 'v1',
                         color: '#EC644B'
@@ -182,7 +135,7 @@
             },
             resizeChart(chart) {
                 chart.configure({
-                    width: this.$refs.panel.clientWidth,
+                    width: this.$refs.panel.clientWidth ? this.$refs.panel.clientWidth : document.getElementById("graphContainer").style.width,
                 });
                 chart.render();
             },
@@ -190,13 +143,26 @@
             insertDatapoints(messages, chart) {
                 for (let i = 0; i < messages.length; i++) {
                     let voltageData = {
-                        Magnitude1: messages[i].v1,
-                        Magnitude2: messages[i].v2,
-                        Magnitude3: messages[i].v3,
-                        Magnitude4: messages[i].v4
+                        Magnitude1: messages[i].v1
                     };
                     chart.series.addData(voltageData);
+
+                    if (mini && maxi) {
+                        if (parseFloat(messages[i].v1) < mini) {
+                            mini = parseFloat(messages[i].v1)
+                        }
+                        if (parseFloat(messages[i].v1) > maxi) {
+                            maxi = parseFloat(messages[i].v1);
+                        }
+                    } else {
+                        mini = parseFloat(messages[i].v1)
+                        maxi = parseFloat(messages[i].v1);
+                    }
                 }
+
+                magnitudeChart.min = mini - 5;
+                magnitudeChart.max = maxi + 5;
+
                 chart.render();
             },
             /* Update displayed values every second on average */
@@ -210,7 +176,7 @@
                     this.messageIndex++;
                 } else {
                     this.messageIndex++;
-                }
+                };
             },
             openSocketListeners() {
                 /*
@@ -251,7 +217,6 @@
                 });
 
                 client.on("close", () => {
-                    console.log("2");
                     this.connStatus = "Disconnected";
                 });
 
@@ -259,21 +224,21 @@
                     const messageReceived = new TextDecoder("utf-8").decode(payload);
 
                     const message = {
-                        v1: messageReceived,
-                        v2: 230,
-                        v3: 240,
-                        v4: 250
+                        v1: messageReceived
                     }
-
-                    console.log(message);
-                    console.log(this);
 
                     // Check if displayed values have to be updated
                     this.updateDisplayedValues();
 
                     // Push stream data to current series, if it's not yet render-time
                     if (this.messageSeries.length < this.renderEveryNth) {
-                        this.messageSeries.push(message);
+                        try {
+                            parseInt(message);
+                            this.messageSeries.push(message);
+                        } catch (err) {
+                            console.log(err);
+                        }
+
                     }
 
                     // Render-time!
