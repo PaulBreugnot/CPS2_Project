@@ -14,3 +14,7 @@
 
 ### Publish
 `mosquitto_pub -h ec2-54-236-113-5.compute-1.amazonaws.com -p 1883 -t [topic] -m [message]`
+
+# PostgreSQL Database
+## Connect using psql
+`psql -h cps2projectdb.cyppypwyycpk.us-east-1.rds.amazonaws.com -d cps2_project -U cps2_admin`
