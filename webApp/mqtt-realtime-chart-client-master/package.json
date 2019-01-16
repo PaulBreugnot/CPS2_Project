@@ -1,6 +1,6 @@
 {
   "name": "vue-mqtt-realtime-chart",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "High-frequency real-time data visualization.",
   "author": "Nick Jokic",
   "private": true,
