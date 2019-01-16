@@ -52,6 +52,7 @@
 <script>
     import io from 'socket.io-client'
     import Rickshaw from 'rickshaw'
+    import Tree from 'vuejs-tree'
     import 'rickshaw/rickshaw.min.css'
     import 'bootstrap/dist/css/bootstrap.css'
     //var socket = io.connect("http://ec2-54-236-113-5.compute-1.amazonaws.com:9001");
@@ -85,12 +86,50 @@
                     v2: "#72c039",
                     v3: "#65b9ac",
                     v3: "#35ccac"
-                }
+                },
+                treeDisplayData: [{
+                        id: 1,
+                        text: 'Root 1',
+                        definition: 'First node',
+                        depth: 1,
+                        checkable: false,
+                        selectable: false,
+                        expandable: true,
+                        disabled: false,
+                        tags: [42],
+                        state: {
+                            checked: false,
+                            expanded: false,
+                            selected: false
+                        },
+                        nodes: [{
+                                text: 'Child 1',
+                                nodes: [{
+                                        text: 'Grandchild 1'
+                                    },
+                                    {
+                                        text: 'Grandchild 2'
+                                    }
+                                ]
+                            },
+                            {
+                                text: 'Child 2'
+                            }
+                        ]
+                    },
+                    {
+                        text: 'Root 2'
+                    }
+                ]
             }
+        },
+        components: {
+            'tree': Tree
         },
         mounted() {
             this.initChart();
             this.openSocketListeners();
+            this.getTree("my-tree-id");
         },
         watch: {
             renderEveryNth: function() {
@@ -99,6 +138,11 @@
             }
         },
         methods: {
+            getTree: function(treeId) {
+                for (var i = 0; i <= this.$children.length - 1; i++) {
+                    if (this.$children[i].$props.id == treeId) return this.$children[i]
+                }
+            },
             /* Rickshaw.js initialization */
             initChart() {
                 magnitudeChart = new Rickshaw.Graph({
@@ -239,6 +283,121 @@
                     }
                 });
 
+            }
+        },
+        computed: {
+            myCustomStyles() {
+                return {
+                    tree: {
+                        height: 'auto',
+                        maxHeight: '300px',
+                        overflowY: 'visible',
+                        display: 'inline-block'
+                    },
+                    row: {
+                        width: '500px',
+                        cursor: 'pointer',
+                        child: {
+                            height: '35px'
+                        }
+                    },
+                    addNode: {
+                        class: 'custom_class',
+                        style: {
+                            color: '#007AD5'
+                        }
+                    },
+                    editNode: {
+                        class: 'custom_class',
+                        style: {
+                            color: '#007AD5'
+                        }
+                    },
+                    deleteNode: {
+                        class: 'custom_class',
+                        style: {
+                            color: '#EE5F5B'
+                        }
+                    },
+                    selectIcon: {
+                        class: 'custom_class',
+                        style: {
+                            color: '#007AD5'
+                        },
+                        active: {
+                            class: 'custom_class',
+                            style: {
+                                color: '#2ECC71'
+                            }
+                        }
+                    },
+                    text: {
+                        style: {},
+                        active: {
+                            style: {
+                                'font-weight': 'bold',
+                                color: '#2ECC71'
+                            }
+                        }
+                    }
+                };
+            },
+            myCustomOptions() {
+                return {
+                    treeEvents: {
+                        expanded: {
+                            state: true,
+                            fn: null,
+                        },
+                        collapsed: {
+                            state: false,
+                            fn: null,
+                        },
+                        selected: {
+                            state: false,
+                            fn: null,
+                        },
+                        checked: {
+                            state: true,
+                            fn: this.myCheckedFunction,
+                        }
+                    },
+                    events: {
+                        expanded: {
+                            state: true,
+                            fn: null,
+                        },
+                        selected: {
+                            state: false,
+                            fn: null,
+                        },
+                        checked: {
+                            state: false,
+                            fn: null,
+                        },
+                        editableName: {
+                            state: false,
+                            fn: null,
+                            calledEvent: null,
+                        }
+                    },
+                    addNode: {
+                        state: false,
+                        fn: null,
+                        appearOnHover: false
+                    },
+                    editNode: {
+                        state: true,
+                        fn: null,
+                        appearOnHover: true
+                    },
+                    deleteNode: {
+                        state: true,
+                        fn: null,
+                        appearOnHover: true
+                    },
+                    showTags: true,
+                };
             }
         }
     }
