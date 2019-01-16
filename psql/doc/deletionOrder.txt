@@ -1,0 +1,7 @@
+sensor_available_measures
+room
+sensor
+sensor_layer
+room_layer
+measure_type
+spatial_ref_sys

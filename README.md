@@ -18,3 +18,9 @@
 # PostgreSQL Database
 ## Connect using psql
 `psql -h cps2projectdb.cyppypwyycpk.us-east-1.rds.amazonaws.com -d cps2_project -U cps2_admin`
+
+## Tables declarations
+SQL dumps are available in psql/dumps
+
+## Doc
+HTML Doc is available in psql/doc
