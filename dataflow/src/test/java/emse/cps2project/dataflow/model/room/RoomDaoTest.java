@@ -1,6 +1,7 @@
 package emse.cps2project.dataflow.model.room;
 
-import emse.cps2project.dataflow.model.room.dao.ItmRoomDao;
+import emse.cps2project.dataflow.model.room.dao.RoomDao;
+import emse.cps2project.dataflow.model.room.dao.RoomLayerDao;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +21,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class RoomDaoTest {
 
     @Autowired
-    private ItmRoomDao itmLayerDao;
+    private RoomDao roomDao;
+
+    @Autowired
+    private RoomLayerDao roomLayerDao;
 
     @Test
-    public void itmTableTest() {
-        List<ItmRoom> itmRooms = itmLayerDao.findAll();
-        for (ItmRoom roomSet : itmRooms) {
-            System.out.println("Room " + roomSet.getId() + " geometry : " + roomSet.getGeometry());
+    public void RoomTableTest() {
+        List<Room> rooms = roomDao.findAll();
+        for (Room room : rooms) {
+            System.out.println("Room " + room.getId() + " geometry : " + room.getGeometry());
+            System.out.println("Layer : " + room.getRoomLayer().getName());
         }
-        assertThat(itmRooms).hasAtLeastOneElementOfType(ItmRoom.class);
+        assertThat(rooms).hasAtLeastOneElementOfType(Room.class);
+    }
+
+    @Test
+    public void ItmRoomLayerTest() {
+        List<RoomLayer> itmLayer = roomLayerDao.findByName("itm");
+        assertThat(itmLayer)
+                .hasAtLeastOneElementOfType(RoomLayer.class)
+                .hasSize(1);
+        List<Room> itmRooms = itmLayer.get(0).getRooms();
+        for (Room room : itmRooms) {
+            System.out.println("Room " + room.getId() + " geometry : " + room.getGeometry());
+        }
+        assertThat(itmRooms).hasAtLeastOneElementOfType(Room.class);
     }
 }

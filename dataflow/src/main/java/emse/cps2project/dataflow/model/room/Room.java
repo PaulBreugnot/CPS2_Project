@@ -3,11 +3,12 @@ package emse.cps2project.dataflow.model.room;
 import javax.persistence.*;
 
 @Entity
-@Table(name="itm")
-public class ItmRoom {
+@Table(name="room")
+public class Room {
 
     @Id
     @GeneratedValue
+    @Column(name="id")
     private Integer id;
 
     @Column(name="geom")
@@ -15,6 +16,11 @@ public class ItmRoom {
 
     @Column(name="refoffice")
     private String refoffice;
+
+
+    @ManyToOne
+    @JoinColumn(name="id_layer")
+    private RoomLayer roomLayer;
 
     public Integer getId() {
         return id;
@@ -38,5 +44,13 @@ public class ItmRoom {
 
     public void setRefoffice(String refoffice) {
         this.refoffice = refoffice;
+    }
+
+    public RoomLayer getRoomLayer() {
+        return roomLayer;
+    }
+
+    public void setRoomLayer(RoomLayer roomLayer) {
+        this.roomLayer = roomLayer;
     }
 }
