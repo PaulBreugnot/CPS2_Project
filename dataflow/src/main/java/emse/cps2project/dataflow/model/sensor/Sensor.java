@@ -11,7 +11,7 @@ import java.util.List;
 public class Sensor {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
     private Integer id;
 
@@ -36,7 +36,7 @@ public class Sensor {
     )
     private List<MeasureType> availableMeasureTypes;
 
-    @OneToMany(mappedBy = "sensor", fetch=FetchType.LAZY)
+    @OneToMany(mappedBy = "sensor", fetch=FetchType.EAGER)
     private List<Observation> observations;
 
     public Integer getId() {

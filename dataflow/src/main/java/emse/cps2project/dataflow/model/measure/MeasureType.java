@@ -10,7 +10,7 @@ import java.util.List;
 public class MeasureType {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
     private Integer id;
 
@@ -20,7 +20,7 @@ public class MeasureType {
     @Column(name="unit")
     private String unit;
 
-    @OneToMany(mappedBy = "measureType", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "measureType", fetch = FetchType.EAGER)
     private List<Observation> observations;
 
     public Integer getId() {

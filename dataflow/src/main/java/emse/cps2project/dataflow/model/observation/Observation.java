@@ -11,7 +11,7 @@ import java.util.Date;
 public class Observation {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
 
@@ -28,6 +28,17 @@ public class Observation {
     @ManyToOne
     @JoinColumn(name="id_sensor")
     private Sensor sensor;
+
+    public Observation() {
+
+    }
+
+    public Observation(Date timestamp, float value, MeasureType measureType, Sensor sensor) {
+        this.timestamp = timestamp;
+        this.value = value;
+        this.measureType = measureType;
+        this.sensor = sensor;
+    }
 
     public Integer getId() {
         return id;
