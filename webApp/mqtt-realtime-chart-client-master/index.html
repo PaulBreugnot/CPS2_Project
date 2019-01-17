@@ -1,18 +1,86 @@
 <!DOCTYPE html>
-<html>
+
+<!--<?php
+    /**
+     *   Example for a simple cas 2.0 client
+     */
+    // Load the settings from the central config file
+    require_once 'config.php';
+    // Load the CAS lib
+    require_once '/phpCAS/CAS.php';
+    // Enable debugging
+    phpCAS::setDebug();
+    // Enable verbose error messages. Disable in production!
+    phpCAS::setVerbose(true);
+    // Initialize phpCAS
+    phpCAS::client(CAS_VERSION_2_0, $cas_host, $cas_port, $cas_context);
+    // For production use set the CA certificate that is the issuer of the cert
+    // on the CAS server and uncomment the line below
+    // phpCAS::setCasServerCACert($cas_server_ca_cert_path);
+    // For quick testing you can disable SSL validation of the CAS server.
+    // THIS SETTING IS NOT RECOMMENDED FOR PRODUCTION.
+    // VALIDATING THE CAS SERVER IS CRUCIAL TO THE SECURITY OF THE CAS PROTOCOL!
+    phpCAS::setNoCasServerValidation();
+    // force CAS authentication
+    phpCAS::forceAuthentication();
+    // at this step, the user has been authenticated by the CAS server
+    // and the user's login name can be read with phpCAS::getUser().
+    // logout if desired
+    if (isset($_REQUEST['logout'])) {
+        phpCAS::logout();
+    }
+    // for this test, simply print that the authentication was successfull
+?>-->
+<html lang="fr">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
     <title>vue-mqtt-realtime-chart</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <link rel="stylesheet" href="main.css">
+    <style>
+        .row {
+            display: flex;
+            margin: 1em;
+        }
+
+        .left {
+            float: left;
+        }
+
+        .right {
+            float: right;
+            margin: 1em;
+        }
+
+    </style>
 </head>
 
 <body>
-    <Tree id="my-tree-id" :custom-options="myCustomOptions" :custom-styles="myCustomStyles" :nodes="treeDisplayData"></Tree>
-    <div id="app"></div>
-    <!-- built files will be auto injected -->
+    <noscript>
+        <strong>We're sorry but demo doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+
+    <header>
+<!--        <h1>Successfull Authentication!</h1>
+        <?php require 'script_info.php' ?>
+        <p>the user's login is <b>
+                <?php echo phpCAS::getUser(); ?></b>.</p>
+        <p>phpCAS version is <b>
+                <?php echo phpCAS::getVersion(); ?></b>.</p>
+        <p><a href="?logout=">Logout</a></p>-->
+    </header>
+
+    <div class="row">
+        <div id="menuScrolling" class="left"></div>
+        <!--<br style="clear:both;" />-->
+        <div id="graphContainer" class="right">
+            <div id="graph" style="width: 100%"></div>
+        </div>
+    </div>
 </body>
 
 </html>
