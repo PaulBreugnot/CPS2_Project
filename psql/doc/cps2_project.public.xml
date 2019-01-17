@@ -25,12 +25,28 @@
       </table>
       <table name="measure_type" numRows="0" remarks="" schema="public" type="TABLE">
          <column autoUpdated="true" defaultValue="nextval('measure_type_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="id_measure_type" foreignKey="measure_type_fkey" implied="false" onDeleteCascade="false" schema="public" table="observation"/>
             <child column="id_measure_type" foreignKey="measure_type_FK" implied="false" onDeleteCascade="false" schema="public" table="sensor_available_measures"/>
          </column>
          <column autoUpdated="false" digits="0" id="1" name="type" nullable="false" remarks="" size="2147483647" type="text"/>
          <column autoUpdated="false" digits="0" id="2" name="unit" nullable="true" remarks="" size="2147483647" type="text"/>
          <primaryKey column="id" sequenceNumberInPK="1"/>
          <index name="measure_type_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+      </table>
+      <table name="observation" numRows="0" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('observation_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="2" id="1" name="timestamp" nullable="true" remarks="" size="25" type="timestamp"/>
+         <column autoUpdated="false" digits="8" id="2" name="value" nullable="true" remarks="" size="8" type="float4"/>
+         <column autoUpdated="false" digits="0" id="3" name="id_measure_type" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="measure_type_fkey" implied="false" onDeleteCascade="false" schema="public" table="measure_type"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="4" name="id_sensor" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="sensor_fkey" implied="false" onDeleteCascade="false" schema="public" table="sensor"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="observation_pkey" unique="true">
             <column ascending="true" name="id"/>
          </index>
       </table>
@@ -90,6 +106,7 @@
       </table>
       <table name="sensor" numRows="4" remarks="" schema="public" type="TABLE">
          <column autoUpdated="true" defaultValue="nextval('sensor_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="id_sensor" foreignKey="sensor_fkey" implied="false" onDeleteCascade="false" schema="public" table="observation"/>
             <child column="id_sensor" foreignKey="sensor_FK" implied="false" onDeleteCascade="false" schema="public" table="sensor_available_measures"/>
          </column>
          <column autoUpdated="false" digits="0" id="1" name="geom" nullable="true" remarks="" size="2147483647" type="geometry"/>

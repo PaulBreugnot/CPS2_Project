@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>measure_type - cps2_project Database</title>
+  <title>observation - cps2_project Database</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <link rel="icon" type="image/png" sizes="16x16" href="../favicon.png">
@@ -76,7 +76,7 @@
   <div class="content-wrapper">
           <!-- Content Header (Page header) -->
       <section class="content-header">
-        <h1>measure_type</h1></br>
+        <h1>observation</h1></br>
 		      </section>
       <!-- Main content -->
       <section class="content">
@@ -116,40 +116,7 @@
 				 <td>10</td>
 				 <td title=''></td>
 				 <td title='Automatically updated by the database'>√</td>
-				 <td>nextval(&#39;measure_type_id_seq&#39;::regclass)</td>
-				 <td>
-				  <table border='0' cellspacing='0' cellpadding='0'>
-				   <tr>
-					<td title="observation.id_measure_type references measure_type.id via measure_type_fkey">
-						<a href='observation.html'>observation</a><span class='relatedKey'>.id_measure_type</span>
-					</td>
-					<td class="constraint detail">
-						measure_type_fkey <span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span>
-					</td>
-				   </tr>
-				   <tr>
-					<td title="sensor_available_measures.id_measure_type references measure_type.id via measure_type_FK">
-						<a href='sensor_available_measures.html'>sensor_available_measures</a><span class='relatedKey'>.id_measure_type</span>
-					</td>
-					<td class="constraint detail">
-						measure_type_FK <span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span>
-					</td>
-				   </tr>
-				  </table>				 
-				 </td>
-				 <td>
-				  <table border='0' cellspacing='0' cellpadding='0'>
-				  </table>					 
-				 </td>
-				 <td></td>
-				</tr>
-				<tr>
-				 <td><span id="type">type</span></td>
-				 <td>text</td>
-				 <td>2147483647</td>
-				 <td title=''></td>
-				 <td title=''></td>
-				 <td>null</td>
+				 <td>nextval(&#39;observation_id_seq&#39;::regclass)</td>
 				 <td>
 				  <table border='0' cellspacing='0' cellpadding='0'>
 				  </table>				 
@@ -161,9 +128,9 @@
 				 <td></td>
 				</tr>
 				<tr>
-				 <td><span id="unit">unit</span></td>
-				 <td>text</td>
-				 <td>2147483647</td>
+				 <td><span id="timestamp">timestamp</span></td>
+				 <td>timestamp</td>
+				 <td>25,2</td>
 				 <td title='nullable'>√</td>
 				 <td title=''></td>
 				 <td>null</td>
@@ -177,9 +144,76 @@
 				 </td>
 				 <td></td>
 				</tr>
+				<tr>
+				 <td><span id="value">value</span></td>
+				 <td>float4</td>
+				 <td>8,8</td>
+				 <td title='nullable'>√</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>				 
+				 </td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="id_measure_type">id_measure_type</span></td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td title='nullable'>√</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>				 
+				 </td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				   <tr>
+					<td title="observation.id_measure_type references measure_type.id via measure_type_fkey">
+						<a href='measure_type.html'>measure_type</a><span class='relatedKey'>.id</span>
+					</td>
+					<td class="constraint detail">
+						measure_type_fkey <span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span>
+					</td>
+				   </tr>
+				  </table>					 
+				 </td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="id_sensor">id_sensor</span></td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td title='nullable'>√</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>				 
+				 </td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				   <tr>
+					<td title="observation.id_sensor references sensor.id via sensor_fkey">
+						<a href='sensor.html'>sensor</a><span class='relatedKey'>.id</span>
+					</td>
+					<td class="constraint detail">
+						sensor_fkey <span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span>
+					</td>
+				   </tr>
+				  </table>					 
+				 </td>
+				 <td></td>
+				</tr>
 								</tbody>
 				</table>
-				<p title='3 columns'>Table contained <span id="recordNumber">0</span> rows<p/>
+				<p title='5 columns'>Table contained <span id="recordNumber">0</span> rows<p/>
 			</div>
 		</div>
 		<div class="box box-primary">		
@@ -206,7 +240,7 @@
 				</thead>
 				<tbody>
 				 <tr>
-				  <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey'></i> measure_type_pkey</td>
+				  <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey'></i> observation_pkey</td>
 				  <td>Primary key</td>
 				  <td><span title='Ascending'>Asc</span></td>
 				  <td>id</td>
@@ -238,22 +272,23 @@
             <div class="tab-content no-padding">            
 				<div class="chart tab-pane active" id="oneDegreeImg-chart" style="position: relative; overflow-x:auto;">					
 					<map id="oneDegreeRelationshipsDiagram" name="oneDegreeRelationshipsDiagram">
-<area shape="rect" id="node1" href="observation.html" title="observation" alt="" coords="441,5,641,181">
-<area shape="rect" id="node2" href="measure_type.html" title="measure_type" alt="" coords="5,144,336,301">
-<area shape="rect" id="node3" href="sensor_available_measures.html" title="sensor_available_measures" alt="" coords="380,199,701,351">
+<area shape="rect" id="node1" href="observation.html" title="observation" alt="" coords="260,5,603,221">
+<area shape="rect" id="node2" href="measure_type.html" title="measure_type" alt="" coords="5,43,216,160">
+<area shape="rect" id="node3" href="sensor.html" title="sensor" alt="" coords="33,177,188,324">
 </map>
 
-					<a name='diagram'><img id='oneDegreeImg' src='../diagrams/measure_type.1degree.png' usemap='#oneDegreeRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+					<a name='diagram'><img id='oneDegreeImg' src='../diagrams/observation.1degree.png' usemap='#oneDegreeRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
 				</div>
 				<div class="chart tab-pane " id="twodegreesDegreeImg-chart" style="position: relative; overflow-x:auto;">					
 					<map id="twoDegreesRelationshipsDiagram" name="twoDegreesRelationshipsDiagram">
-<area shape="rect" id="node1" href="observation.html" title="observation" alt="" coords="441,5,641,181">
-<area shape="rect" id="node2" href="measure_type.html" title="measure_type" alt="" coords="5,39,336,196">
-<area shape="rect" id="node3" href="sensor.html" title="sensor" alt="" coords="93,219,248,307">
-<area shape="rect" id="node4" href="sensor_available_measures.html" title="sensor_available_measures" alt="" coords="380,199,701,351">
+<area shape="rect" id="node1" href="observation.html" title="observation" alt="" coords="501,5,844,221">
+<area shape="rect" id="node2" href="measure_type.html" title="measure_type" alt="" coords="247,97,457,215">
+<area shape="rect" id="node3" href="sensor.html" title="sensor" alt="" coords="275,235,429,381">
+<area shape="rect" id="node4" href="sensor_layer.html" title="sensor_layer" alt="" coords="5,267,203,355">
+<area shape="rect" id="node5" href="sensor_available_measures.html" title="sensor_available_measures" alt="" coords="512,239,833,327">
 </map>
 
-					<a name='diagram'><img id='twodegreesDegreeImg' src='../diagrams/measure_type.2degrees.png' usemap='#twoDegreesRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+					<a name='diagram'><img id='twodegreesDegreeImg' src='../diagrams/observation.2degrees.png' usemap='#twoDegreesRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
 				</div>
 			  			</div>
 			</div>

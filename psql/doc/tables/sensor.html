@@ -120,6 +120,14 @@
 				 <td>
 				  <table border='0' cellspacing='0' cellpadding='0'>
 				   <tr>
+					<td title="observation.id_sensor references sensor.id via sensor_fkey">
+						<a href='observation.html'>observation</a><span class='relatedKey'>.id_sensor</span>
+					</td>
+					<td class="constraint detail">
+						sensor_fkey <span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span>
+					</td>
+				   </tr>
+				   <tr>
 					<td title="sensor_available_measures.id_sensor references sensor.id via sensor_FK">
 						<a href='sensor_available_measures.html'>sensor_available_measures</a><span class='relatedKey'>.id_sensor</span>
 					</td>
@@ -255,19 +263,21 @@
             <div class="tab-content no-padding">            
 				<div class="chart tab-pane active" id="oneDegreeImg-chart" style="position: relative; overflow-x:auto;">					
 					<map id="oneDegreeRelationshipsDiagram" name="oneDegreeRelationshipsDiagram">
-<area shape="rect" id="node1" href="sensor.html" title="sensor" alt="" coords="247,32,564,219">
-<area shape="rect" id="node2" href="sensor_layer.html" title="sensor_layer" alt="" coords="5,123,203,240">
-<area shape="rect" id="node3" href="sensor_available_measures.html" title="sensor_available_measures" alt="" coords="608,5,929,157">
+<area shape="rect" id="node1" href="observation.html" title="observation" alt="" coords="669,5,869,181">
+<area shape="rect" id="node2" href="sensor.html" title="sensor" alt="" coords="247,144,564,331">
+<area shape="rect" id="node3" href="sensor_layer.html" title="sensor_layer" alt="" coords="5,235,203,352">
+<area shape="rect" id="node4" href="sensor_available_measures.html" title="sensor_available_measures" alt="" coords="608,199,929,351">
 </map>
 
 					<a name='diagram'><img id='oneDegreeImg' src='../diagrams/sensor.1degree.png' usemap='#oneDegreeRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
 				</div>
 				<div class="chart tab-pane " id="twodegreesDegreeImg-chart" style="position: relative; overflow-x:auto;">					
 					<map id="twoDegreesRelationshipsDiagram" name="twoDegreesRelationshipsDiagram">
-<area shape="rect" id="node1" href="sensor.html" title="sensor" alt="" coords="247,5,564,192">
-<area shape="rect" id="node2" href="sensor_layer.html" title="sensor_layer" alt="" coords="5,96,203,213">
-<area shape="rect" id="node3" href="sensor_available_measures.html" title="sensor_available_measures" alt="" coords="608,64,929,216">
-<area shape="rect" id="node4" href="measure_type.html" title="measure_type" alt="" coords="300,209,511,297">
+<area shape="rect" id="node1" href="observation.html" title="observation" alt="" coords="669,5,869,181">
+<area shape="rect" id="node2" href="measure_type.html" title="measure_type" alt="" coords="300,57,511,145">
+<area shape="rect" id="node3" href="sensor.html" title="sensor" alt="" coords="247,204,564,391">
+<area shape="rect" id="node4" href="sensor_layer.html" title="sensor_layer" alt="" coords="5,295,203,412">
+<area shape="rect" id="node5" href="sensor_available_measures.html" title="sensor_available_measures" alt="" coords="608,199,929,351">
 </map>
 
 					<a name='diagram'><img id='twodegreesDegreeImg' src='../diagrams/sensor.2degrees.png' usemap='#twoDegreesRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							

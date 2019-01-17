@@ -1,4 +1,5 @@
 sensor_available_measures
+observation
 room
 sensor
 sensor_layer
