@@ -1,6 +1,9 @@
 package emse.cps2project.dataflow.model.sensor;
 
+import emse.cps2project.dataflow.model.measure.MeasureType;
+
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name="sensor")
@@ -20,6 +23,14 @@ public class Sensor {
     @ManyToOne
     @JoinColumn(name="id_layer")
     private SensorLayer sensorLayer;
+
+    @ManyToMany
+    @JoinTable(
+            name = "sensor_available_measures",
+            joinColumns = { @JoinColumn(name = "id_sensor") },
+            inverseJoinColumns = { @JoinColumn(name = "id_measure_type") }
+    )
+    private List<MeasureType> availableMeasureTypes;
 
     public Integer getId() {
         return id;
@@ -51,5 +62,13 @@ public class Sensor {
 
     public void setSensorLayer(SensorLayer sensorLayer) {
         this.sensorLayer = sensorLayer;
+    }
+
+    public List<MeasureType> getAvailableMeasureTypes() {
+        return availableMeasureTypes;
+    }
+
+    public void setAvailableMeasureTypes(List<MeasureType> availableMeasureTypes) {
+        this.availableMeasureTypes = availableMeasureTypes;
     }
 }
