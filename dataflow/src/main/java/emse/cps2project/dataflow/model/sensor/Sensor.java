@@ -25,6 +25,9 @@ public class Sensor {
     @JoinColumn(name="id_layer")
     private SensorLayer sensorLayer;
 
+    @Column(name="topic")
+    private String topic;
+
     @ManyToMany
     @JoinTable(
             name = "sensor_available_measures",
@@ -66,6 +69,14 @@ public class Sensor {
 
     public void setSensorLayer(SensorLayer sensorLayer) {
         this.sensorLayer = sensorLayer;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
     }
 
     public List<MeasureType> getAvailableMeasureTypes() {
