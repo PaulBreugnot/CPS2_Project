@@ -1,6 +1,7 @@
 package emse.cps2project.dataflow.model.sensor;
 
 import emse.cps2project.dataflow.model.measure.MeasureType;
+import emse.cps2project.dataflow.model.observation.Observation;
 import emse.cps2project.dataflow.model.room.Room;
 import emse.cps2project.dataflow.model.room.RoomLayer;
 import emse.cps2project.dataflow.model.room.dao.RoomLayerDao;
@@ -63,5 +64,18 @@ public class SensorDaoTest {
         assertThat(sensor.getAvailableMeasureTypes()).hasAtLeastOneElementOfType(MeasureType.class);
         assertThat(sensor.getAvailableMeasureTypes()).hasSize(2);
 
+    }
+
+    @Test
+    public void observationTests() {
+        Sensor sensor = sensorDao.findById(1).orElse(null);
+        assertThat(sensor).isNotEqualTo(null);
+        for (Observation obs : sensor.getObservations()) {
+            System.out.println("Observation at " + obs.getTimestamp() +
+                    " for " + obs.getMeasureType().getType() +
+                    " : " + obs.getValue() +
+                    " " + obs.getMeasureType().getUnit());
+        }
+        assertThat(sensor.getObservations()).hasAtLeastOneElementOfType(Observation.class);
     }
 }

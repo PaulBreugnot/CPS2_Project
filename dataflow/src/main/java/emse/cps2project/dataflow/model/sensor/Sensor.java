@@ -1,6 +1,7 @@
 package emse.cps2project.dataflow.model.sensor;
 
 import emse.cps2project.dataflow.model.measure.MeasureType;
+import emse.cps2project.dataflow.model.observation.Observation;
 
 import javax.persistence.*;
 import java.util.List;
@@ -31,6 +32,9 @@ public class Sensor {
             inverseJoinColumns = { @JoinColumn(name = "id_measure_type") }
     )
     private List<MeasureType> availableMeasureTypes;
+
+    @OneToMany(mappedBy = "sensor", fetch=FetchType.LAZY)
+    private List<Observation> observations;
 
     public Integer getId() {
         return id;
@@ -70,5 +74,13 @@ public class Sensor {
 
     public void setAvailableMeasureTypes(List<MeasureType> availableMeasureTypes) {
         this.availableMeasureTypes = availableMeasureTypes;
+    }
+
+    public List<Observation> getObservations() {
+        return observations;
+    }
+
+    public void setObservations(List<Observation> observations) {
+        this.observations = observations;
     }
 }

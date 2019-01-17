@@ -1,6 +1,9 @@
 package emse.cps2project.dataflow.model.measure;
 
+import emse.cps2project.dataflow.model.observation.Observation;
+
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name="measure_type")
@@ -16,6 +19,9 @@ public class MeasureType {
 
     @Column(name="unit")
     private String unit;
+
+    @OneToMany(mappedBy = "measureType", fetch = FetchType.LAZY)
+    private List<Observation> observations;
 
     public Integer getId() {
         return id;
@@ -39,5 +45,13 @@ public class MeasureType {
 
     public void setUnit(String unit) {
         this.unit = unit;
+    }
+
+    public List<Observation> getObservations() {
+        return observations;
+    }
+
+    public void setObservations(List<Observation> observations) {
+        this.observations = observations;
     }
 }
