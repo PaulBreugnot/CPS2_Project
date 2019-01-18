@@ -345,7 +345,7 @@
 
                 client.on("message", (topic, payload) => {
                     const messageReceived = new TextDecoder("utf-8").decode(payload);
-                    this.lastValue[topic] = parseInt(messageReceived);
+                    this.lastValue[topic] = parseFloat(messageReceived);
                 });
 
                 setInterval(() => {
