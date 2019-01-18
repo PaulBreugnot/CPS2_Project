@@ -58,14 +58,6 @@
 
     const client = mqtt.connect("ws://ec2-54-236-113-5.compute-1.amazonaws.com:9001");
 
-    client.on("connect", function() {
-        client.subscribe("test_topic", function(err) {
-            if (err) {
-                console.log(err);
-            }
-        });
-    });
-
     var mini;
     var maxi;
 
@@ -88,6 +80,56 @@
         mounted() {
             this.initChart();
             this.openSocketListeners();
+
+            const tempMain = this;
+
+            client.on("connect", function() {
+
+                const req = new XMLHttpRequest();
+
+                req.open('GET', 'http://192.168.12.1:8080/api/sensorlayers', true);
+
+                req.onload = function() {
+                    // Ici, this.readyState égale XMLHttpRequest.DONE .
+                    if (req.status === 200) {
+                        const layers = JSON.parse(req.responseText);
+
+                        layers.forEach(function(elt) {
+
+                            const sensors = elt.sensors;
+
+                            sensors.forEach(function(sensor) {
+
+                                if (sensor.topic) {
+
+                                    const availableMeasures = sensor.availableMeasures;
+
+                                    availableMeasures.forEach(function(measure) {
+
+                                        client.subscribe(sensor.topic + "/metrics/" + measure.type, function(err) {
+                                            if (err) {
+                                                console.log(err);
+                                            }
+                                        });
+                                    });
+
+                                }
+                            });
+                        });
+
+                    } else {
+                        console.log("Status de la réponse: %d (%s)", req.status, req.statusText);
+                    }
+                };
+
+                req.send(null);
+            });
+
+            client.subscribe("emse/fayol/e0/itm/sensors/-3/metrics/TMP", function(err) {
+                if (err) {
+                    console.log(err);
+                }
+            });
         },
         watch: {
             renderEveryNth: function() {
