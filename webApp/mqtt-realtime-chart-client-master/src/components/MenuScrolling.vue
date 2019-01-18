@@ -42,11 +42,19 @@
                             children: []
                         };
 
-                        const sensors = elt.sensors;
+                        elt.sensors.forEach(function(sensor) {
 
-                        sensors.forEach(function(sensor) {
+                            const availableMeasures = [];
+
+                            sensor.availableMeasures.forEach(function(measure) {
+                                availableMeasures.push({
+                                    title: measure.type
+                                });
+                            });
+
                             tempTree.children.push({
-                                title: sensor.name
+                                title: sensor.id,
+                                children: availableMeasures
                             });
                         });
 
@@ -102,17 +110,10 @@
                                         () => this.$refs.tree1.delNode(node, parent, index)
                                     } > delete < /button> <
                                     /span>*/
-                return <span >
-                    <
-                    button class = "treebtn1"
-                onClick = {
-                    () => this.$refs.tree1.addNode(node, {
-                        title: 'sync node'
-                    })
-                } > + < /button> <
-                span class = {
-                    titleClass
-                }
+                return <span > <
+                    span class = {
+                        titleClass
+                    }
                 domPropsInnerHTML = {
                     node.title
                 }
@@ -120,11 +121,7 @@
                     () => {
                         this.$refs.tree1.nodeSelected(node)
                     }
-                } > < /span><
-                button class = "treebtn3"
-                onClick = {
-                    () => this.$refs.tree1.delNode(node, parent, index)
-                } > delete < /button> < /
+                } > < /span>< /
                 span >
             },
             async asyncLoad1(node) {
