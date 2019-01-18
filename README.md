@@ -29,15 +29,17 @@
 - change mqtt_port
 - uncomment mqtt_user & mqtt_password can be needed also in the mqtt_client.connect
 ## choose the topic
-- change topic
+- change `topic`
+- change also `mqtt_client.connect("??")`
 - update and select the type of sensor : TEMP HMDT LUMI ...
 
 ## select the number frequence of measurment
 - `#define DELTA_T`
-- publish with the frequency given by DELTA T or when the value has changed significantly since the last publishing using the boolean "regular"
+- to ease the data analysing, we publish with the frequency given by DELTA T and not when the value has changed significantly since the last publishing.
 
 # raspberry
 ## Useful CLI
+- `sudo raspi-config`
 - `scp document.csv loic@192.168.1.17:/home/loic/Desktop`
 - `sudo apt-get install screen` : The screen let’s you initiate a process in the background as an independent process. So, you can close the terminal/SSH connection or anything at all, the screen will be running the script in the background.
 - `pip3 install paho-mqtt`
