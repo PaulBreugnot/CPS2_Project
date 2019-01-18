@@ -14,7 +14,7 @@
                     <!-- Panel div start -->
                     <div class="panel panel-primary">
                         <div class="panel-heading">
-                            <h3 class="panel-title">Magnitude</h3>
+                            <h3 class="panel-title">Values</h3>
                         </div>
                         <div class="panel-body">
                             <!-- Chart container -->
@@ -26,9 +26,12 @@
                         </div>
                         <div class="panel-footer">
                             <p v-if="displayedValues.length > 0">
-                                <small>
-                                    <span v-bind:style="{ color: dvColors.v1}">{{displayedValues[0].v1}} </span> ℃
+                                <small v-for="topic in topics">
+                                    <span v-bind:style="{ color: dvColors[topic]}"> {{displayedValues[0][topic]}} </span>{{measures[topics.indexOf(topic)]}}
                                 </small>
+                            </p>
+                            <p v-else>
+                                <img src="../assets/Loading_icon.gif">
                             </p>
                         </div>
                     </div>
@@ -58,16 +61,54 @@
 
     const client = mqtt.connect("ws://ec2-54-236-113-5.compute-1.amazonaws.com:9001");
 
-    client.on("connect", function() {
-        client.subscribe("test_topic", function(err) {
-            if (err) {
-                console.log(err);
-            }
-        });
-    });
-
     var mini;
     var maxi;
+
+    function HSVtoRGB(h, s, v) {
+        var r, g, b, i, f, p, q, t;
+        if (arguments.length === 1) {
+            s = h.s, v = h.v, h = h.h;
+        }
+        i = Math.floor(h * 6);
+        f = h * 6 - i;
+        p = v * (1 - s);
+        q = v * (1 - f * s);
+        t = v * (1 - (1 - f) * s);
+        switch (i % 6) {
+            case 0:
+                r = v, g = t, b = p;
+                break;
+            case 1:
+                r = q, g = v, b = p;
+                break;
+            case 2:
+                r = p, g = v, b = t;
+                break;
+            case 3:
+                r = p, g = q, b = v;
+                break;
+            case 4:
+                r = t, g = p, b = v;
+                break;
+            case 5:
+                r = v, g = p, b = q;
+                break;
+        }
+        return {
+            r: Math.round(r * 255),
+            g: Math.round(g * 255),
+            b: Math.round(b * 255)
+        };
+    }
+
+    function componentToHex(c) {
+        var hex = c.toString(16);
+        return hex.length == 1 ? "0" + hex : hex;
+    }
+
+    function rgbToHex(r, g, b) {
+        return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+    }
 
     const main = {
         name: 'graph',
@@ -79,15 +120,72 @@
                 streamFrequency: 50,
                 connStatus: "Disconnected",
                 messageIndex: 0,
+                topics: [],
+                measures: [],
                 displayedValues: [],
-                dvColors: {
-                    v1: "#cb503a"
-                }
+                dvColors: {},
+                lastValue: {}
             }
         },
         mounted() {
-            this.initChart();
-            this.openSocketListeners();
+
+            const tempMain = this;
+
+            client.on("connect", function() {
+
+                const req = new XMLHttpRequest();
+
+                req.open('GET', 'http://192.168.12.1:8080/api/sensorlayers', true);
+
+                req.onload = function() {
+                    // Ici, this.readyState égale XMLHttpRequest.DONE .
+                    if (req.status === 200) {
+                        const layers = JSON.parse(req.responseText);
+
+                        layers.forEach(function(layer) {
+
+                            const sensors = layer.sensors;
+
+                            sensors.forEach(function(sensor) {
+
+                                if (sensor.topic) {
+
+                                    const availableMeasures = sensor.availableMeasures;
+
+                                    availableMeasures.forEach(function(measure) {
+
+                                        client.subscribe(sensor.topic + "/metrics/" + measure.type, function(err) {
+                                            if (err) {
+                                                console.log(err);
+                                            }
+                                        });
+
+                                        tempMain.measures.push(measure.unit);
+                                        tempMain.topics.push(sensor.topic + "/metrics/" + measure.type);
+                                    });
+
+                                }
+                            });
+                        });
+
+                        let index = 0;
+
+                        tempMain.topics.forEach(function(elt) {
+                            const color = HSVtoRGB(index / tempMain.topics.length, 1, 0.63);
+                            tempMain.dvColors[elt] = rgbToHex(color.r, color.g, color.b);
+                            index++;
+                        });
+
+                        tempMain.initChart();
+                        tempMain.openSocketListeners();
+
+                    } else {
+                        console.log("Status de la réponse: %d (%s)", req.status, req.statusText);
+                    }
+                };
+
+                req.send(null);
+            });
         },
         watch: {
             renderEveryNth: function() {
@@ -98,23 +196,32 @@
         methods: {
             /* Rickshaw.js initialization */
             initChart() {
+
+                let listSeries = [];
+
+                for (var i = 0; i < this.topics.length; i++) {
+                    listSeries.push({
+                        name: this.topics[i],
+                        color: this.dvColors[this.topics[i]]
+                    });
+                }
+
                 magnitudeChart = new Rickshaw.Graph({
                     element: document.querySelector("#demo_chart"),
                     width: "500",
                     height: "180",
-                    renderer: "line",
+                    renderer: "scatterplot",
                     min: 0,
                     max: 0,
-                    series: new Rickshaw.Series.FixedDuration([{
-                        name: 'v1',
-                        color: '#EC644B'
-                    }], undefined, {
+                    series: new Rickshaw.Series.FixedDuration(listSeries, undefined, {
                         timeInterval: this.updateInterval,
                         maxDataPoints: 100,
                         timeBase: new Date().getTime() / 1000
 
                     })
                 });
+
+                magnitudeChart.renderer.dotSize = 2;
 
                 var y_axis = new Rickshaw.Graph.Axis.Y({
                     graph: magnitudeChart,
@@ -141,22 +248,36 @@
             },
             /* Insert received datapoints into the chart */
             insertDatapoints(messages, chart) {
-                for (let i = 0; i < messages.length; i++) {
-                    let voltageData = {
-                        Magnitude1: messages[i].v1
-                    };
-                    chart.series.addData(voltageData);
 
-                    if (mini && maxi) {
-                        if (parseFloat(messages[i].v1) < mini) {
-                            mini = parseFloat(messages[i].v1)
+                const tempMain = this;
+
+                for (let i = 0; i < messages.length; i++) {
+
+                    let voltageData = {};
+
+                    this.topics.forEach(function(key) {
+                        if (messages[i][key]) {
+
+                            const value = parseFloat(messages[i][key]);
+
+                            voltageData[key] = value;
+
+                            if (mini && maxi) {
+                                if (value < mini) {
+                                    mini = value;
+                                }
+                                if (value > maxi) {
+                                    maxi = value;
+                                }
+                            } else {
+                                mini = value;
+                                maxi = value;
+                            }
                         }
-                        if (parseFloat(messages[i].v1) > maxi) {
-                            maxi = parseFloat(messages[i].v1);
-                        }
-                    } else {
-                        mini = parseFloat(messages[i].v1)
-                        maxi = parseFloat(messages[i].v1);
+                    });
+
+                    if (voltageData) {
+                        chart.series.addData(voltageData);
                     }
                 }
 
@@ -220,33 +341,35 @@
                     this.connStatus = "Disconnected";
                 });
 
+                this.connStatus = client.connected ? "Connected" : "Disconnected";
+
                 client.on("message", (topic, payload) => {
                     const messageReceived = new TextDecoder("utf-8").decode(payload);
+                    this.lastValue[topic] = parseInt(messageReceived);
+                });
 
-                    const message = {
-                        v1: messageReceived
-                    }
+                setInterval(() => {
+                    if (Object.keys(this.lastValue).length) {
 
-                    // Check if displayed values have to be updated
-                    this.updateDisplayedValues();
+                        // Check if displayed values have to be updated
+                        this.updateDisplayedValues();
 
-                    // Push stream data to current series, if it's not yet render-time
-                    if (this.messageSeries.length < this.renderEveryNth) {
-                        try {
-                            parseInt(message);
-                            this.messageSeries.push(message);
-                        } catch (err) {
-                            console.log(err);
+                        // Push stream data to current series, if it's not yet render-time
+                        if (this.messageSeries.length < this.renderEveryNth) {
+                            this.messageSeries.push(this.lastValue);
+
                         }
 
+                        // Render-time!
+                        if (this.messageSeries.length == this.renderEveryNth) {
+                            this.insertDatapoints(this.messageSeries, magnitudeChart);
+                            this.messageSeries = [];
+                        }
+
+                        this.lastValue = {};
                     }
 
-                    // Render-time!
-                    if (this.messageSeries.length == this.renderEveryNth) {
-                        main.methods.insertDatapoints(this.messageSeries, magnitudeChart);
-                        this.messageSeries = [];
-                    }
-                });
+                }, 100)
 
             }
         },
