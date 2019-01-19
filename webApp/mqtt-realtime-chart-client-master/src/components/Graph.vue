@@ -1,56 +1,105 @@
 <template>
-    <div style="display: flex;">
-        <div style="float: left;">
-            <div class="tree3">
-                <input class="tree-search-input" type="text" v-model="searchword" placeholder="search..." />
-                <button class=" tree-search-btn" type="button" @click="search">search</button>
-                <v-tree ref='tree1' :canDeleteRoot="false" :data='layersTree' :draggable='false' :tpl='tpl' :halfcheck='true' :multiple="true" />
-            </div>
-        </div>
-        <br style="clear:both;" />
-        <div style="float: right; width: 100%; top: 0; bottom: 0; left: 0; right: 0; margin: 0;" id="graphContainer">
-            <div class="container-fluid">
-                <div class="row text-center">
-                    <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-4">
-                        <h1>Status: {{connStatus}}</h1>
-
-                        <!-- Panel div start -->
-                        <div class="panel panel-primary">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Values</h3>
-                            </div>
-                            <div class="panel-body">
-                                <!-- Chart container -->
-                                <div id="chart_container">
-                                    <div id="y_axis"></div>
-                                    <div id="demo_chart" ref="panel"></div>
-                                </div>
-                                <!-- End of chart container -->
-                            </div>
-                            <div class="panel-footer">
-                                <p v-if="displayedTopics.length > 0">
-                                    <small v-for="topic in displayedTopics">
-                                        <span v-bind:style="{ color: dvColors[topic]}"> {{displayedValues[0][topic]}} {{measures[topics.indexOf(topic)]}} / </span>
-                                    </small>
-                                </p>
-                                <p v-else>
-                                    <img src="../assets/Loading_icon.gif" style="width: 100%;">
-                                </p>
-                            </div>
-                        </div>
-                        <!-- Panel div end -->
-
-                        <!-- Range slider chart-refresh control -->
-                        <div class="col-xs-6 col-xs-offset-3 col-md-6 col-md-offset-3 col-lg-8 col-lg-offset-2">
-                            <input v-model="renderEveryNth" type="range" min="1" max="20" value="1">
-                            <p>Render after <strong>{{renderEveryNth}}</strong> message(s)</p>
-                        </div>
-                        <!-- End of range slider -->
-                    </div>
+    <div>
+        <header id="site-header" class="nav is-fixed" style="display: flex;">
+            <div style="display: left;" class="row">
+                <div class="column">
+                    <a href="https://minbot.fr/">
+                        <img class="logo" src="../assets/logo-pixled.png" alt="Pixled" title="Pixled">
+                    </a>
+                </div>
+                <div class="column">
+                    <a href="/">
+                    <img class="logo" src="../assets/logo-emse.png" alt="EMSE" title="EMSE">
+                    </a>
                 </div>
             </div>
-        </div>
+            <br style="clear:both;" />
+            <div class="container" style="display: right;">
+                <scrollactive ref="scrollactive" :offset="offset" :always-track="alwaysTrack" :duration="duration" :click-to-scroll="clickToScroll" :bezier-easing-value="easing">
+                    <ul class="nav-center">
+                        <li><a href="#section-1" class="scrollactive-item nav-item">Map</a></li>
+                        <li><a href="#section-2" class="scrollactive-item nav-item">Graph</a></li>
+                    </ul>
+                </scrollactive>
+            </div>
+        </header>
+        <main>
+            <section id="section-1" class="mapContainer">
+                <div class="maincontent">
+                    <div id="menu">
+                        <ul>
+                            <li><img src="../assets/iconlayer1.png" id="onglet1" align="left" width="45px" height="38px"></li>
+                            <li><img src="../assets/iconlayer2.png" id="onglet2" align="left" width="45px" height="38px"></li>
+                        </ul>
+                    </div>
+                    <div id="map"></div>
+                    <div id="status"><b>Entity information</b> <br />
+                        <div id="statusselect">Selected <br /></div>
+                        <div id="statushover">Hovered <br /></div>
+                    </div>
+                </div>
+            </section>
+            <br style="clear:both;" />
+            <section id="section-2">
+                <div style="top: 3em; display: flex; position: relative;">
+                    <div style="float: left;">
+                        <div class="tree3">
+                            <input class="tree-search-input" type="text" v-model="searchword" placeholder="search..." />
+                            <button class=" tree-search-btn" type="button" @click="search">search</button>
+                            <v-tree ref='tree1' :canDeleteRoot="false" :data='layersTree' :draggable='false' :tpl='tpl' :halfcheck='true' :multiple="true" />
+                        </div>
+                    </div>
+                    <br style="clear:both;" />
+                    <div style="float: right; width: 100%; top: 0; bottom: 0; left: 0; right: 0; margin: 0;" id="graphContainer">
+                        <div class="container-fluid">
+                            <div class="row text-center">
+                                <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-4">
+                                    <h1>Status: {{connStatus}}</h1>
+
+                                    <!-- Panel div start -->
+                                    <div class="panel panel-primary">
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title">Values</h3>
+                                        </div>
+                                        <div class="panel-body">
+                                            <!-- Chart container -->
+                                            <div id="chart_container">
+                                                <div id="y_axis"></div>
+                                                <div id="demo_chart" ref="panel"></div>
+                                            </div>
+                                            <!-- End of chart container -->
+                                        </div>
+                                        <div class="panel-footer">
+                                            <p v-if="displayedTopics.length > 0">
+                                                <span v-for="topic in displayedTopics">
+                                                    <span v-bind:style="{ color: dvColors[topic]}"> {{displayedValues[0][topic]}} {{measures[topics.indexOf(topic)]}} / </span>
+                                                </span>
+                                            </p>
+                                            <p v-else>
+                                                <img src="../assets/Loading_icon.gif" style="width: 100%;">
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <!-- Panel div end -->
+
+                                    <!-- Range slider chart-refresh control -->
+                                    <div class="col-xs-6 col-xs-offset-3 col-md-6 col-md-offset-3 col-lg-8 col-lg-offset-2">
+                                        <input v-model="renderEveryNth" type="range" min="1" max="20" value="1">
+                                        <p>Render after <strong>{{renderEveryNth}}</strong> message(s)</p>
+                                    </div>
+                                    <!-- End of range slider -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <footer>
+            <p>Institut Fayol @ École des Mines de Saint-Étienne - Inspiring innovation</p>
+        </footer>
     </div>
+
 </template>
 
 <script>
@@ -136,12 +185,25 @@
                     title: 'Layers',
                     expanded: true,
                     children: []
-                }]
+                }],
+                elements: [],
+                alwaysTrack: false,
+                duration: 600,
+                clickToScroll: true,
+                offset: 52,
+                easing: '.5,0,.35,1'
             }
+        },
+        computed: {
+            numberOfElements() {
+                return this.elements.length;
+            },
         },
         mounted() {
 
             const tempMain = this;
+
+            this.elements = this.$el.querySelectorAll('.scrollactive-item');
 
             client.on("connect", function() {
 
@@ -184,6 +246,7 @@
 
                                     tempMain.measures.push(measure.unit);
                                     tempMain.topics.push(topic + "/metrics/" + measure.type);
+                                    tempMain.displayedTopics.push(topic + "/metrics/" + measure.type);
                                 });
 
                                 tempTree.children.push({
@@ -218,9 +281,6 @@
 
                 req.send(null);
             });
-
-
-
 
             //------------------------------------------------------------------------------------------
             // Script map
@@ -665,27 +725,21 @@
 
             // script_init
 
-            $(document).ready(function () {
+            $(document).ready(function() {
                 mapbase = createMapBase('mapboxStreets');
                 map = createMap(mapbase, 'map', center, tabext, baseview);
+
+                map.overlayContainerStopEvent_.hidden = true;
+
                 currentResolution = map.getView().getResolution();
                 map.getView().on('change:resolution', map_changeresolution);
                 // map.on('singleclick',map_onclick);
                 map.addInteraction(selectPointerMove);
                 map.addInteraction(selectSingleClick);
+
+                //map.overlayContainerStopEvent.hidden = true;
+
             });
-
-/*            mapbase = createMapBase('mapboxStreets');
-            map = createMap(mapbase, 'map', center, tabext, baseview);
-            currentResolution = map.getView().getResolution();
-            map.getView().on('change:resolution', map_changeresolution);
-            // map.on('singleclick',map_onclick);
-            map.addInteraction(selectPointerMove);
-            map.addInteraction(selectSingleClick);*/
-
-
-
-
         },
         watch: {
             renderEveryNth: function() {
@@ -1047,6 +1101,8 @@
 </script>
 
 <style scoped>
+    @import '../assets/stylesheets/style_iot.css';
+
     #chart_container {
         padding-right: 40px;
         padding-bottom: 20px;

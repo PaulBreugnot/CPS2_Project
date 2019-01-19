@@ -6,6 +6,8 @@ import router from './router'
 
 import MenuScrolling from './MenuScrolling.vue'
 
+import VueScrollactive from 'vue-scrollactive'
+
 import 'vue-tree-halower/dist/halower-tree.min.css'
 import {
     VTree,
@@ -14,6 +16,7 @@ import {
 
 Vue.use(VTree)
 Vue.use(VSelectTree)
+Vue.use(VueScrollactive)
 
 Vue.config.productionTip = false
 
