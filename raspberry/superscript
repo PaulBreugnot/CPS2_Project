@@ -1,0 +1,2 @@
+screen python3 /home/pi/Adafruit_Python_DHT/examples/AdafruitDHT3.py 11 17
+ 

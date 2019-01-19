@@ -53,10 +53,10 @@ MQTTClient mqtt_client ;
  *  2. what are the MQTT broket IP address and TCP port
  */
 
-String topic = "emse/fayol/e0/itm/sensors/-3/metrics/";
+String topic = "emse/fayol/e0/itm/sensors/-2/metrics/";
 
-const char* wifi_ssid = "loic";
-const char* wifi_password = "ZRcPY2Lm";
+const char* wifi_ssid = "Livebox-881E";
+const char* wifi_password = "loulousdedevesset";
 
 const char* mqtt_host = "ec2-54-236-113-5.compute-1.amazonaws.com" ;
 const uint16_t mqtt_port = 1883;
@@ -159,7 +159,7 @@ void reconnect() {
   Serial.print(mqtt_port) ;
   Serial.println(" ...") ;
 
-  while ( !mqtt_client.connect("3")){//, mqtt_user,mqtt_password) ) {
+  while ( !mqtt_client.connect("2")){//, mqtt_user,mqtt_password) ) {
     delay(500);
     Serial.println(".");
     delay(500);
