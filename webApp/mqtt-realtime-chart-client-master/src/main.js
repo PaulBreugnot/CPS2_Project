@@ -7,18 +7,21 @@ import router from './router'
 import MenuScrolling from './MenuScrolling.vue'
 
 import 'vue-tree-halower/dist/halower-tree.min.css'
-import {VTree, VSelectTree} from 'vue-tree-halower'
+import {
+    VTree,
+    VSelectTree
+} from 'vue-tree-halower'
 
 Vue.use(VTree)
 Vue.use(VSelectTree)
 
 Vue.config.productionTip = false
 
+/*
 new Vue({
-  render: h => h(MenuScrolling)
-}).$mount('#menuScrolling')
+    render: h => h(MenuScrolling)
+}).$mount('#menuScrolling')*/
 
-Vue.config.productionTip = false
 
 /* eslint-disable no-new */
 new Vue({
@@ -27,5 +30,8 @@ new Vue({
     components: {
         Graph
     },
-    template: '<Graph/>'
+    template: '<Graph/>',
+    render: h => h(Graph)
 })
+
+Vue.config.productionTip = false

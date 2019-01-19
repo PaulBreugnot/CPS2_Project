@@ -1,48 +1,52 @@
 <template>
-    <div>
-        <div class="container-fluid">
-            <div class="row text-center">
+    <div style="display: flex;">
+        <div style="float: left;">
+            <div class="tree3">
+                <input class="tree-search-input" type="text" v-model="searchword" placeholder="search..." />
+                <button class=" tree-search-btn" type="button" @click="search">search</button>
+                <v-tree ref='tree1' :canDeleteRoot="false" :data='layersTree' :draggable='false' :tpl='tpl' :halfcheck='true' :multiple="true" />
+            </div>
+        </div>
+        <br style="clear:both;" />
+        <div style="float: right; width: 100%; top: 0; bottom: 0; left: 0; right: 0; margin: 0;" id="graphContainer">
+            <div class="container-fluid">
+                <div class="row text-center">
+                    <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-4">
+                        <h1>Status: {{connStatus}}</h1>
 
-                <!-- Panel div start -->
-                <!--                <div class="col-xs-12 col-lg-4 col-lg-offset-4">
-                    <img src="../assets/logo.png" width="100" height="100">
-                </div>-->
-
-                <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-4">
-                    <h1>Status: {{connStatus}}</h1>
-
-                    <!-- Panel div start -->
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Values</h3>
-                        </div>
-                        <div class="panel-body">
-                            <!-- Chart container -->
-                            <div id="chart_container">
-                                <div id="y_axis"></div>
-                                <div id="demo_chart" ref="panel"></div>
+                        <!-- Panel div start -->
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Values</h3>
                             </div>
-                            <!-- End of chart container -->
+                            <div class="panel-body">
+                                <!-- Chart container -->
+                                <div id="chart_container">
+                                    <div id="y_axis"></div>
+                                    <div id="demo_chart" ref="panel"></div>
+                                </div>
+                                <!-- End of chart container -->
+                            </div>
+                            <div class="panel-footer">
+                                <p v-if="displayedTopics.length > 0">
+                                    <small v-for="topic in displayedTopics">
+                                        <span v-bind:style="{ color: dvColors[topic]}"> {{displayedValues[0][topic]}} {{measures[topics.indexOf(topic)]}} / </span>
+                                    </small>
+                                </p>
+                                <p v-else>
+                                    <img src="../assets/Loading_icon.gif" style="width: 100%;">
+                                </p>
+                            </div>
                         </div>
-                        <div class="panel-footer">
-                            <p v-if="displayedValues.length > 0">
-                                <small v-for="topic in topics">
-                                    <span v-bind:style="{ color: dvColors[topic]}"> {{displayedValues[0][topic]}} </span>{{measures[topics.indexOf(topic)]}}
-                                </small>
-                            </p>
-                            <p v-else>
-                                <img src="../assets/Loading_icon.gif">
-                            </p>
-                        </div>
-                    </div>
-                    <!-- Panel div end -->
+                        <!-- Panel div end -->
 
-                    <!-- Range slider chart-refresh control -->
-                    <div class="col-xs-6 col-xs-offset-3 col-md-6 col-md-offset-3 col-lg-8 col-lg-offset-2">
-                        <input v-model="renderEveryNth" type="range" min="1" max="20" value="1">
-                        <p>Render after <strong>{{renderEveryNth}}</strong> message(s)</p>
+                        <!-- Range slider chart-refresh control -->
+                        <div class="col-xs-6 col-xs-offset-3 col-md-6 col-md-offset-3 col-lg-8 col-lg-offset-2">
+                            <input v-model="renderEveryNth" type="range" min="1" max="20" value="1">
+                            <p>Render after <strong>{{renderEveryNth}}</strong> message(s)</p>
+                        </div>
+                        <!-- End of range slider -->
                     </div>
-                    <!-- End of range slider -->
                 </div>
             </div>
         </div>
@@ -123,8 +127,16 @@
                 topics: [],
                 measures: [],
                 displayedValues: [],
+                displayedTopics: [],
                 dvColors: {},
-                lastValue: {}
+                lastValue: {},
+                searchword: '',
+                initSelected: ['Layers'],
+                layersTree: [{
+                    title: 'Layers',
+                    expanded: true,
+                    children: []
+                }]
             }
         },
         mounted() {
@@ -135,37 +147,54 @@
 
                 const req = new XMLHttpRequest();
 
-                req.open('GET', 'http://192.168.12.1:8080/api/sensorlayers', true);
+                /*req.open('GET', 'http://192.168.12.1:8080/api/sensorlayers', true);*/
+                req.open('GET', 'http://ec2-54-236-113-5.compute-1.amazonaws.com:8090/api/sensorlayers', true);
 
-                req.onload = function() {
+                function onLoad() {
                     // Ici, this.readyState égale XMLHttpRequest.DONE .
                     if (req.status === 200) {
                         const layers = JSON.parse(req.responseText);
 
                         layers.forEach(function(layer) {
 
-                            const sensors = layer.sensors;
+                            const tempTree = {
+                                title: layer.name,
+                                id: "emse/fayol/e0/" + layer.name.replace('sensor', ''),
+                                children: []
+                            };
 
-                            sensors.forEach(function(sensor) {
+                            layer.sensors.forEach(function(sensor) {
 
-                                if (sensor.topic) {
+                                const availableMeasures = []
 
-                                    const availableMeasures = sensor.availableMeasures;
+                                const topic = sensor.topic ? sensor.topic : "emse/fayol/e0/itm/sensors/" + sensor.id
 
-                                    availableMeasures.forEach(function(measure) {
+                                sensor.availableMeasures.forEach(function(measure) {
 
-                                        client.subscribe(sensor.topic + "/metrics/" + measure.type, function(err) {
-                                            if (err) {
-                                                console.log(err);
-                                            }
-                                        });
-
-                                        tempMain.measures.push(measure.unit);
-                                        tempMain.topics.push(sensor.topic + "/metrics/" + measure.type);
+                                    availableMeasures.push({
+                                        title: measure.type,
+                                        id: topic + "/metrics/" + measure.type
                                     });
 
-                                }
+                                    client.subscribe(topic + "/metrics/" + measure.type, function(err) {
+                                        if (err) {
+                                            console.log(err);
+                                        }
+                                    });
+
+                                    tempMain.measures.push(measure.unit);
+                                    tempMain.topics.push(topic + "/metrics/" + measure.type);
+                                });
+
+                                tempTree.children.push({
+                                    title: sensor.name ? sensor.name : sensor.id,
+                                    id: topic,
+                                    children: availableMeasures
+                                });
                             });
+
+                            tempMain.layersTree[0].children.push(tempTree);
+
                         });
 
                         let index = 0;
@@ -181,11 +210,482 @@
 
                     } else {
                         console.log("Status de la réponse: %d (%s)", req.status, req.statusText);
+                        setTimeout(onLoad, 5000);
                     }
                 };
 
+                req.onload = onLoad();
+
                 req.send(null);
             });
+
+
+
+
+            //------------------------------------------------------------------------------------------
+            // Script map
+            //------------------------------------------------------------------------------------------
+
+            // script_onglets
+
+            function load_tab(elt) {
+                if (elt.id === 'onglet1') {
+                    if (layer1.getVisible()) {
+                        layer1.setVisible(false);
+                        map.removeLayer(layer1);
+                    } else {
+                        if (map.getView().getResolution() > 1) {
+                            // layer1 = createLayerSensorCluster('sensorbase_4');
+                            layer1 = createLayerSensorCluster('sensoritm');
+                            console.log("Create LayerSensorCluster");
+                        } else {
+                            // layer1 = createLayerSensor('sensorbase_4');
+                            layer1 = createLayerSensor('sensoritm');
+                            console.log("Create LayerSensor");
+                        }
+                        map.addLayer(layer1);
+                        layer1.setVisible(true);
+                    }
+                    return;
+                }
+                if (elt.id === 'onglet2') {
+                    if (layer2.getVisible()) {
+                        layer2.setVisible(false);
+                        map.removeLayer(layer2);
+                    } else {
+                        // layer2 = createLayerOffice('office_4');
+                        layer2 = createLayerOffice('itm');
+                        console.log("Create LayerOffice");
+                        map.addLayer(layer2);
+                        layer2.setVisible(true);
+                    }
+                    return;
+                }
+            }
+
+            const onglet1 = document.getElementById("onglet1");
+            const onglet2 = document.getElementById("onglet2");
+
+            onglet1.onclick = function() {
+                load_tab(onglet1);
+            };
+            onglet2.onclick = function() {
+                load_tab(onglet2);
+            };
+
+            // script_changeresolution
+
+            function map_changeresolution(evt) {
+                var viewResolution = /** @type {number} */ (map.getView().getResolution());
+                if (layer1.getVisible()) {
+                    if (viewResolution > 1 && currentResolution <= 1) {
+                        layer1.setVisible(false);
+                        map.removeLayer(layer1);
+                        // layer1 = createLayerSensorCluster('sensorbase_4');
+                        layer1 = createLayerSensor('sensoritm');
+                        map.addLayer(layer1);
+                    } else if (viewResolution <= 1 && currentResolution > 1) {
+                        layer1.setVisible(false);
+                        map.removeLayer(layer1);
+                        // layer1 = createLayerSensor('sensorbase_4');
+                        layer1 = createLayerSensor('sensoritm');
+                        map.addLayer(layer1);
+                        layer1.setVisible(true);
+                    }
+                }
+                currentResolution = viewResolution;
+            }
+
+            // script_mouseevent
+
+            selectPointerMove = new ol.interaction.Select({
+                layers: function(layer) {
+                    return (layer.get('name') === 'sensor' && layer.getVisible());
+                },
+                filter: function(feature, layer) {
+                    return map.getView().getResolution() <= 1;
+                },
+                condition: ol.events.condition.pointerMove,
+                style: [new ol.style.Style({
+                    image: new ol.style.RegularShape({
+                        fill: new ol.style.Fill({
+                            color: 'rgba(220,20,60,0.6)'
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: 'rgba(220,20,60,1.0)',
+                            width: 3
+                        }),
+                        points: 3,
+                        radius: 14,
+                        rotation: Math.PI / 4,
+                        angle: 0
+                    })
+                })]
+            });
+
+            // script_onclick
+
+            function map_onclick(evt) {
+                var features = new Array();
+                if (map.getView().getResolution() <= 1) {
+                    map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+                        features.push(feature);
+                    }, {
+                        layerFilter: function(layer) {
+                            return ((layer.get('name') === 'office' && layer.getVisible()));
+                        }
+                    });
+                    var arraylength = features.length;
+                    if (arraylength > 0) {
+                        alert('feature selected on click: ' + arraylength);
+                    }
+                }
+            }
+
+            // script_map
+
+            function createMapBase(spec) {
+                if (spec == 'mapboxLight') {
+                    return new ol.layer.Tile({
+                        source: new ol.source.XYZ({
+                            url: 'https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZmFiaWVuLWVtc2UiLCJhIjoiY2l6anYyMXpjMDA0cjJ3dGZ0Z3NrdDUxNCJ9.37SAR2gk4Hur4a8ZTkbRSw'
+                        })
+                    });
+
+                }
+
+                if (spec == 'mapboxDark') {
+                    return new ol.layer.Tile({
+                        source: new ol.source.XYZ({
+                            url: 'https://api.mapbox.com/styles/v1/mapbox/dark-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZmFiaWVuLWVtc2UiLCJhIjoiY2l6anYyMXpjMDA0cjJ3dGZ0Z3NrdDUxNCJ9.37SAR2gk4Hur4a8ZTkbRSw'
+                        })
+                    });
+
+                }
+
+                if (spec == 'mapboxStreets') {
+                    return new ol.layer.Tile({
+                        source: new ol.source.XYZ({
+                            url: 'https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZmFiaWVuLWVtc2UiLCJhIjoiY2l6anYyMXpjMDA0cjJ3dGZ0Z3NrdDUxNCJ9.37SAR2gk4Hur4a8ZTkbRSw'
+                        })
+                    });
+
+                }
+
+                var tilebase = new ol.layer.Tile({
+                    title: 'Annona OSM Layer',
+                    source: new ol.source.OSM(),
+                    type: 'base',
+                    visible: true
+                });
+
+                tilebase.set('name', 'MapBase');
+                return tilebase;
+            }
+
+            function createMap(elt_base, elt_div, center, tabext, baseview) {
+                var minZ = 19;
+                var maxZ = 21;
+                var zoomZ = baseview;
+                var valcenter = ol.proj.transform(center, 'EPSG:4326', 'EPSG:3857');
+                var valextent = ol.extent.applyTransform(tabext, ol.proj.getTransform("EPSG:4326", "EPSG:3857"));
+
+                var map = new ol.Map({
+                    target: elt_div,
+                    renderer: 'canvas',
+                    controls: ol.control.defaults().extend([
+                        new ol.control.OverviewMap()
+                    ]),
+                    layers: [elt_base],
+                    /*interactions: ol.interaction.defaults({
+                       dragPan: false
+                       }),*/
+                    view: new ol.View({
+                        projection: 'EPSG:3857',
+                        center: valcenter,
+                        //[5.38035,43.30937] Marseille
+                        //[4.38833,45.43656] Saint-Etienne
+                        zoom: zoomZ,
+                        rotation: -0.35,
+                        minZoom: minZ,
+                        maxZoom: maxZ,
+                        extent: valextent,
+                        //[5.28796, 43.37792, 5.53023, 43.2234],
+                    }),
+                });
+                return map;
+            }
+
+            selectSingleClick = new ol.interaction.Select({
+                layers: function(layer) {
+                    return (layer.get('name') === 'office' && layer.getVisible());
+                },
+                filter: function(feature, layer) {
+                    return map.getView().getResolution() <= 1;
+                },
+                condition: ol.events.condition.click,
+                style: [new ol.style.Style({
+                    fill: new ol.style.Fill({
+                        color: 'rgba(255,0,255, 0.3)'
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: 'rgba(255,0,255, 0.6)',
+                        width: 3
+                    })
+                })]
+            });
+
+            selectPointerMove.on('select', function(e) {
+                var tabfeatures = e.target.getFeatures();
+                var texthtml = 'Hovered <br />';
+                tabfeatures.forEach(function(f) {
+                    texthtml += 'id: ' + f.get('id') + ' -- ';
+                    texthtml += 'base size: ' + f.get('capacity') + '<br />';
+                });
+                $('#statushover').html(texthtml);
+            });
+
+            selectSingleClick.on('select', function(e) {
+                var tabfeatures = e.target.getFeatures();
+                var texthtml = 'Selected <br />';
+                tabfeatures.forEach(function(f) {
+                    texthtml += 'id: ' + f.get('id') + ' -- ';
+                    texthtml += 'ref: ' + f.get('refoffice') + '<br />';
+                });
+                $('#statusselect').html(texthtml);
+            });
+
+            // script_layer
+
+            function createLayerSensorCluster(table) {
+                var imageCK = new ol.style.Circle({
+                    radius: 12,
+                    stroke: new ol.style.Stroke({
+                        color: 'rgba(220,20,60,0.8)',
+                        width: 2
+                    }),
+                    fill: new ol.style.Fill({
+                        color: 'rgba(220,20,60,0.4)'
+                    })
+                });
+                var formatSensor = new ol.format.GML2({
+                    featureType: "Sensorbase",
+                    featureNS: "http://mapserver.gis.umn.edu/mapserver",
+                    version: "1.1.0",
+                    featurePrefix: "ms",
+                    geometryName: "msGeometry"
+                });
+
+                var sensor = new ol.source.Vector({
+                    loader: function(extent) {
+                        sensor.clear();
+                        $.ajax(url_mapserv + 'map=' + mymap, {
+                            type: 'POST',
+                            data: {
+                                service: 'WFS',
+                                version: '1.1.0',
+                                request: 'GetFeature',
+                                outputformat: 'GML2',
+                                typename: 'Sensorbase',
+                                srsname: 'EPSG:4326',
+                                bbox: extent.join(',') + ',EPSG:3857',
+                                solname: table
+                            }
+                        }).done(function(response) {
+                            var testV = formatSensor.readFeatures(response, {
+                                dataProjection: ol.proj.Projection('EPSG:4326'),
+                                featureProjection: ol.proj.Projection('EPSG:3857')
+                            });
+                            for (var i = 0; i < testV.length; i++) {
+                                testV[i].getGeometry().transform('EPSG:4326', 'EPSG:3857');
+
+                            }
+                            sensor.addFeatures(testV);
+                        });
+                    },
+                    strategy: ol.loadingstrategy.bbox,
+                    projection: 'EPSG:3857',
+                    format: formatSensor
+                });
+
+                var clusterSource = new ol.source.Cluster({
+                    distance: 20,
+                    source: sensor,
+                });
+
+                var styleCache = {};
+                var sensorL = new ol.layer.Vector({
+                    source: clusterSource,
+                    style: function(feature, resolution) {
+                        var size = feature.get('features').length;
+                        var style = styleCache[size];
+                        if (!style) {
+                            style = [new ol.style.Style({
+                                image: imageCK,
+                                text: new ol.style.Text({
+                                    text: size.toString(),
+                                    fill: new ol.style.Fill({
+                                        color: '#ffffff'
+                                    })
+                                })
+                            })];
+                            styleCache[size] = style;
+                        }
+                        return style;
+                    }
+                });
+                sensorL.set('name', 'sensor');
+                sensorL.setZIndex(5);
+                return sensorL;
+            }
+
+            function createLayerSensor(table) {
+                var formatSensor = new ol.format.GML2({
+                    featureType: "Sensorbase",
+                    featureNS: "http://mapserver.gis.umn.edu/mapserver",
+                    version: "1.1.0",
+                    featurePrefix: "ms",
+                    geometryName: "msGeometry"
+                });
+
+                var sensor = new ol.source.Vector({
+                    loader: function(extent) {
+                        sensor.clear();
+                        $.ajax(url_mapserv + 'map=' + mymap, {
+                            type: 'POST',
+                            data: {
+                                service: 'WFS',
+                                version: '1.1.0',
+                                request: 'GetFeature',
+                                outputformat: 'GML2',
+                                typename: 'Sensorbase',
+                                srsname: 'EPSG:4326',
+                                bbox: extent.join(',') + ',EPSG:3857',
+                                solname: table
+                            }
+                        }).done(function(response) {
+                            var testV = formatSensor.readFeatures(response, {
+                                dataProjection: ol.proj.Projection('EPSG:4326'),
+                                featureProjection: ol.proj.Projection('EPSG:3857')
+                            });
+                            for (var i = 0; i < testV.length; i++) {
+                                testV[i].getGeometry().transform('EPSG:4326', 'EPSG:3857');
+                            }
+                            sensor.addFeatures(testV);
+                        });
+                    },
+                    strategy: ol.loadingstrategy.bbox,
+                    projection: 'EPSG:3857',
+                    format: formatSensor
+                });
+
+
+                var sensorL = new ol.layer.Vector({
+                    source: sensor,
+                    style: [new ol.style.Style({
+                        image: new ol.style.RegularShape({
+                            fill: new ol.style.Fill({
+                                color: 'rgba(220,20,60,0.4)'
+                            }),
+                            stroke: new ol.style.Stroke({
+                                color: 'rgba(220,20,60,0.8)',
+                                width: 2
+                            }),
+                            points: 3,
+                            radius: 10,
+                            rotation: Math.PI / 4,
+                            angle: 0
+                        })
+                    })]
+                });
+
+                sensorL.set('name', 'sensor');
+                sensorL.setZIndex(5);
+                return sensorL;
+            }
+
+            function createLayerOffice(table) {
+                var formatOffice = new ol.format.GML2({
+                    featureType: "Office",
+                    featureNS: "http://mapserver.gis.umn.edu/mapserver",
+                    version: "1.1.0",
+                    featurePrefix: "ms",
+                    geometryName: "msGeometry"
+                });
+
+                var office = new ol.source.Vector({
+                    loader: function(extent) {
+                        office.clear();
+                        $.ajax(url_mapserv + 'map=' + mymap, {
+                            type: 'POST',
+                            data: {
+                                service: 'WFS',
+                                version: '1.1.0',
+                                request: 'GetFeature',
+                                outputformat: 'GML2',
+                                typename: 'Office',
+                                srsname: 'EPSG:4326',
+                                bbox: extent.join(',') + ',EPSG:3857',
+                                solname: table
+                            }
+                        }).done(function(response) {
+                            var testV = formatOffice.readFeatures(response, {
+                                dataProjection: ol.proj.Projection('EPSG:4326'),
+                                featureProjection: ol.proj.Projection('EPSG:3857')
+                            });
+                            for (var i = 0; i < testV.length; i++) {
+                                testV[i].getGeometry().transform('EPSG:4326', 'EPSG:3857');
+                            }
+                            office.addFeatures(testV);
+                        });
+                    },
+                    strategy: ol.loadingstrategy.bbox,
+                    projection: 'EPSG:3857',
+                    format: formatOffice
+                });
+
+
+                var officeL = new ol.layer.Vector({
+                    source: office,
+                    style: [new ol.style.Style({
+                        fill: new ol.style.Fill({
+                            color: 'rgba(190,190,190, 0.5)'
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: 'rgba(255,0,255, 0.6)',
+                            width: 2
+                        })
+                    })]
+                });
+
+                officeL.set('name', 'office');
+                officeL.setZIndex(2);
+                return officeL;
+            }
+
+            // script_init
+
+            $(document).ready(function () {
+                mapbase = createMapBase('mapboxStreets');
+                map = createMap(mapbase, 'map', center, tabext, baseview);
+                currentResolution = map.getView().getResolution();
+                map.getView().on('change:resolution', map_changeresolution);
+                // map.on('singleclick',map_onclick);
+                map.addInteraction(selectPointerMove);
+                map.addInteraction(selectSingleClick);
+            });
+
+/*            mapbase = createMapBase('mapboxStreets');
+            map = createMap(mapbase, 'map', center, tabext, baseview);
+            currentResolution = map.getView().getResolution();
+            map.getView().on('change:resolution', map_changeresolution);
+            // map.on('singleclick',map_onclick);
+            map.addInteraction(selectPointerMove);
+            map.addInteraction(selectSingleClick);*/
+
+
+
+
         },
         watch: {
             renderEveryNth: function() {
@@ -194,6 +694,37 @@
             }
         },
         methods: {
+            nodechecked(node, v) {
+                alert('that a node-check envent ...' + node.title + v)
+            },
+            // tpl (node, ctx, parent, index, props) {
+            tpl(...args) {
+                let {
+                    0: node,
+                    2: parent,
+                    3: index
+                } = args;
+                let titleClass = node.selected ? 'node-title node-selected' : 'node-title';
+                if (node.searched) titleClass += ' node-searched';
+                return <span > <
+                    span
+                class = {
+                    titleClass
+                }
+                domPropsInnerHTML = {
+                    node.title
+                }
+                onClick = {
+                    () => {
+                        this.$refs.tree1.nodeSelected(node);
+                        this.updateDisplayedTopics();
+                    }
+                } > < /span>< /
+                span >
+            },
+            search() {
+                this.$refs.tree1.searchNodes(this.searchword)
+            },
             /* Rickshaw.js initialization */
             initChart() {
 
@@ -208,7 +739,7 @@
 
                 magnitudeChart = new Rickshaw.Graph({
                     element: document.querySelector("#demo_chart"),
-                    width: "500",
+                    width: "300",
                     height: "180",
                     renderer: "scatterplot",
                     min: 0,
@@ -242,7 +773,7 @@
             },
             resizeChart(chart) {
                 chart.configure({
-                    width: this.$refs.panel.clientWidth ? this.$refs.panel.clientWidth : document.getElementById("graphContainer").style.width,
+                    width: this.$refs.panel.clientWidth ? this.$refs.panel.clientWidth : document.getElementById("graphContainer").clientWidth,
                 });
                 chart.render();
             },
@@ -255,10 +786,11 @@
 
                     let voltageData = {};
 
-                    this.topics.forEach(function(key) {
+                    tempMain.topics.forEach(function(key) {
+
                         if (messages[i][key]) {
 
-                            const value = parseFloat(messages[i][key]);
+                            const value = messages[i][key];
 
                             voltageData[key] = value;
 
@@ -276,15 +808,28 @@
                         }
                     });
 
-                    if (voltageData) {
+                    if (Object.keys(voltageData).length) {
                         chart.series.addData(voltageData);
                     }
                 }
 
-                magnitudeChart.min = mini - 5;
-                magnitudeChart.max = maxi + 5;
+                if (mini && maxi) {
+                    magnitudeChart.min = mini - 5;
+                    magnitudeChart.max = maxi + 5;
+                }
 
                 chart.render();
+            },
+            updateDisplayedTopics() {
+
+                const listCheckedNodes = this.$refs.tree1.getCheckedNodes();
+                this.displayedTopics = [];
+
+                listCheckedNodes.forEach((node) => {
+                    if (node && node.id && this.topics.includes(node.id)) {
+                        this.displayedTopics.push(node.id);
+                    }
+                });
             },
             /* Update displayed values every second on average */
             updateDisplayedValues() {
@@ -344,32 +889,39 @@
                 this.connStatus = client.connected ? "Connected" : "Disconnected";
 
                 client.on("message", (topic, payload) => {
-                    const messageReceived = new TextDecoder("utf-8").decode(payload);
-                    this.lastValue[topic] = parseFloat(messageReceived);
+                    if (this.displayedTopics.includes(topic)) {
+                        const messageReceived = new TextDecoder("utf-8").decode(payload);
+                        try {
+                            this.lastValue[topic] = parseFloat(messageReceived);
+                        } catch (err) {
+                            console.log(err);
+                        }
+                    }
                 });
 
                 setInterval(() => {
                     if (Object.keys(this.lastValue).length) {
+                        setTimeout(() => {
 
-                        // Check if displayed values have to be updated
-                        this.updateDisplayedValues();
+                            // Check if displayed values have to be updated
+                            this.updateDisplayedValues();
 
-                        // Push stream data to current series, if it's not yet render-time
-                        if (this.messageSeries.length < this.renderEveryNth) {
-                            this.messageSeries.push(this.lastValue);
+                            // Push stream data to current series, if it's not yet render-time
+                            if (this.messageSeries.length < this.renderEveryNth) {
+                                this.messageSeries.push(this.lastValue);
 
-                        }
+                            }
 
-                        // Render-time!
-                        if (this.messageSeries.length == this.renderEveryNth) {
-                            this.insertDatapoints(this.messageSeries, magnitudeChart);
-                            this.messageSeries = [];
-                        }
+                            // Render-time!
+                            if (this.messageSeries.length == this.renderEveryNth) {
+                                this.insertDatapoints(this.messageSeries, magnitudeChart);
+                                this.messageSeries = [];
+                            }
 
-                        this.lastValue = {};
+                            this.lastValue = {};
+                        }, 500)
                     }
-
-                }, 100)
+                }, 2000)
 
             }
         },
@@ -525,6 +1077,61 @@
     .glyphicon {
         color: #8E44AD;
         font-weight: bold;
+    }
+
+    .tree3 {
+        float: left;
+        /*width: 33%;*/
+        padding: 10px;
+        box-sizing: border-box;
+        border: 1px dotted #ccccdd;
+        overflow: auto;
+        height: 800px;
+    }
+
+    .treebtn1 {
+        background-color: transparent;
+        border: 1px solid #ccc;
+        padding: 1px 3px;
+        border-radius: 5px;
+        margin-right: 5px;
+        color: rgb(148, 147, 147);
+    }
+
+    .treebtn2 {
+        background-color: transparent;
+        border: 1px solid #ccc;
+        padding: 3px 5px;
+        border-radius: 5px;
+        margin-left: 5px;
+        color: rgb(97, 97, 97);
+    }
+
+    .treebtn3 {
+        background-color: transparent;
+        border: 1px solid #ccc;
+        padding: 3px 5px;
+        border-radius: 5px;
+        margin-left: 5px;
+        color: rgb(63, 63, 63);
+    }
+
+    .tree-search-input {
+        width: 70%;
+        padding: 6px 8px;
+        outline: none;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+
+    .tree-search-btn {
+        width: 25%;
+        padding: 6px 8px;
+        outline: none;
+        border-radius: 6px;
+        background-color: rgb(218, 218, 218);
+        border: 1px solid rgb(226, 225, 225);
+        color: rgb(117, 117, 117);
     }
 
 </style>

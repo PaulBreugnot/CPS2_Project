@@ -1,0 +1,123 @@
+#
+# Start of map file
+#
+MAP
+	NAME "CORE EXAMPLE"
+	STATUS ON
+	SIZE 800 800	
+	EXTENT 4.40369 45.42768 4.40423 45.42807
+	UNITS DD
+	IMAGECOLOR 255 255 255
+	#TEMPLATEPATTERN "template*"
+	PROJECTION
+		"init=epsg:4326"		
+	END
+	MAXSIZE 4096
+	#OUTPUTFORMAT
+	#NAME "geojson"
+	#DRIVER "TEMPLATE"
+	#DRIVER "OGR/GEOJSON"
+	#MIMETYPE "application/json; subtype=geojson; charset=utf-8"
+	#FORMATOPTION "FILE=template.js" 	
+	#END
+	#OUTPUTFORMAT
+	#NAME agg
+	#DRIVER AGG/PNG
+	#IMAGEMODE RGB
+	#END	
+	#OUTPUTFORMAT
+	#NAME kml
+  	#DRIVER "KML"
+  	#MIMETYPE "application/vnd.google-earth.kml+xml"
+  	#IMAGEMODE RGB
+  	#EXTENSION "kml"  	
+	#END
+	#OUTPUTFORMAT
+  	#NAME kmz
+	#DRIVER "KMZ"
+	#MIMETYPE "application/vnd.google-earth.kmz"
+	#IMAGEMODE RGB
+	#EXTENSION "kmz"
+	#END
+	#
+	# Start of web interface definition (including WMS enabling metadata)
+	#
+        WEB	
+		MINSCALE 88
+		MAXSCALE 1550000
+		IMAGEPATH "/tmp/"
+		IMAGEURL "/tmp/"
+		TEMPPATH "/tmp/"
+		METADATA
+			"ows_title" "Core Example"
+			"ows_accessconstraints" "none"			
+			"ows_srs" "EPSG:4326 EPSG:3857"
+			"ows_enable_request" "*"
+			"ows_format" "image/png"
+			"ows_feature_info_mime_type" "text/plain,text/html,application/json,application/vnd.ogc.gml,geojson"			  
+		END
+	END
+	# Start of layer definitions
+	#
+	LAYER
+		CONNECTIONTYPE postgis		
+		NAME "Office"
+		CONNECTION "host='193.49.165.40' dbname='core-example' user='student' password='student' port=5434"
+		DATA "geom from %solname% USING unique id"		
+		TYPE POLYGON
+		UNITS DD
+		VALIDATION
+		'solname' '^[a-zA-Z0-9_]+'
+		END
+		METADATA
+			"ows_title" "Office"
+			"ows_srs" "EPSG:4326" ## REQUIRED			
+			"ows_enable_request" "*"
+	      		"ows_types"   "auto"
+			"ows_geometries" "geom"
+    			"ows_geom_type" "polygon"
+			"ows_include_items" "all" ## Optional (serves all attributes for layer)
+      			"ows_featureid"     "id" ## REQUIRED
+			"gml_include_items" "all" ## Optional (serves all attributes for layer) id,refoffice,taille,sensor
+      			"gml_featureid"     "id" ## REQUIRED 
+		END
+		STATUS ON
+		TOLERANCE 10
+		DUMP TRUE		
+		TRANSPARENCY 100
+		PROJECTION
+			"init=epsg:4326"
+		END
+		TEMPLATE template_office.html
+	END
+	LAYER
+		CONNECTIONTYPE postgis		
+		NAME "Sensorbase"
+		CONNECTION "host='193.49.165.40' dbname='core-example' user='student' password='student' port=5434"
+		DATA "geom from %solname% USING unique id"
+		TYPE POINT
+		VALIDATION
+		'solname' '^[a-zA-Z0-9_]+'
+		END
+		METADATA
+			"ows_title" "Sensorbase"
+			"ows_srs" "EPSG:4326" ## REQUIRED
+			"ows_enable_request" "*"
+			"ows_types"   "auto"
+			"ows_include_items" "all" ## Optional (serves all attributes for layer)
+      			"ows_featureid"     "id" ## REQUIRED
+			"ows_geometries" "geom"
+    			"ows_geom_type" "point"
+			"gml_include_items" "all" ## Optional (serves all attributes for layer)
+      			"gml_featureid"     "id" ## REQUIRED 
+		END
+		STATUS ON
+		TOLERANCE 10
+		DUMP TRUE		
+		TRANSPARENCY 100
+		PROJECTION
+			"init=epsg:4326"
+		END
+		TEMPLATE template_sensorbase.html
+	END
+END # Map File

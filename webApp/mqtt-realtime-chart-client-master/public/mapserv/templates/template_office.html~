@@ -1,0 +1,28 @@
+<!-- MapServer Template -->
+<html>
+<head>
+  <title>Delivery points</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+  <style type="text/css">
+	body{    
+	margin: 0px;
+	padding: 0;
+	background:none transparent;
+	}	
+  </style>
+  <body>
+  
+  <h3>Delivery point information</h3>
+  <p>
+    <i>Name:</i> [logo]<br />
+    <i>Address:</i> [address]<br />
+    <br />
+    <i>Weight:</i> [demand]<br />
+    <i>Weight CPD-RC:</i> [demandcpd_rc]<br />
+    <i>Weight CPE-RC:</i> [demandcpe_rc]<br />
+    <i>Service time:</i> [service_time]<br />
+  </p>
+
+  </body>
+</html> 

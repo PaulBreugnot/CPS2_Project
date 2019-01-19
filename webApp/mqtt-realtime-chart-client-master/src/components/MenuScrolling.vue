@@ -1,73 +1,90 @@
+Skip to content
+Why GitHub?
+Enterprise
+Explore
+Marketplace
+Pricing
+
+Search
+
+Sign in
+Sign up
+24 610 139 halower/vue-tree
+Code Issues 14 Pull requests 0 Projects 0 Insights
+Join GitHub today
+GitHub is home to over 28 million developers working together to host and review code, manage projects, and build software together.
+
+vue-tree/demo/src/components/HelloWorld.vue
+992186a on 17 Oct 2018
+@CosSalt CosSalt [dev]
+
+167 lines (164 sloc) 4.5 KB
 <template>
     <div>
         <div class="tree3">
             <input class="tree-search-input" type="text" v-model="searchword" placeholder="search..." />
             <button class=" tree-search-btn" type="button" @click="search">search</button>
-            <v-tree ref='tree1' :canDeleteRoot="true" :data='layersTree' :draggable='true' :tpl='tpl' :halfcheck='true' :multiple="true" />
+            <v-tree ref='tree1' :canDeleteRoot="true" :data='treeData1' :draggable='true' :tpl='tpl' :halfcheck='true' :multiple="true" />
+        </div>
+        <div class="tree3">
+            <v-tree ref="tree2" :data='treeData2' :multiple='false' @node-check='nodechecked' @async-load-nodes='asyncLoad2' />
+        </div>
+        <div class="tree3">
+            <v-select-tree :data='treeData3' v-model='initSelected' :multiple="true" />
         </div>
     </div>
 </template>
 
 <script>
-    const main = {
-        name: 'MenuScrolling',
+    export default {
+        name: 'HelloWorld',
         data() {
             return {
                 searchword: '',
-                initSelected: ['Layers'],
-                layersTree: [{
-                    title: 'Layers',
+                initSelected: ['node-1'],
+                treeData1: [{
+                    title: 'node1',
                     expanded: true,
-                    children: []
+                    children: [{
+                        title: 'node 1-1',
+                        expanded: true,
+                        children: [{
+                            title: 'node 1-1-1'
+                        }, {
+                            title: 'node 1-1-2'
+                        }, {
+                            title: 'node 1-1-3'
+                        }]
+                    }, {
+                        title: 'node 1-2',
+                        children: [{
+                            title: "<span style='color: red'>node 1-2-1</span>"
+                        }, {
+                            title: "<span style='color: red'>node 1-2-2</span>"
+                        }]
+                    }]
+                }],
+                treeData2: [{
+                    title: 'node1',
+                    expanded: false,
+                    async: true
+                }],
+                treeData3: [{
+                    title: 'node1',
+                    expanded: true,
+                    children: [{
+                        title: 'node 1-1',
+                        expanded: true,
+                        children: [{
+                            title: 'node 1-1-1'
+                        }, {
+                            title: 'node 1-1-2'
+                        }, {
+                            title: 'node 1-1-3'
+                        }]
+                    }]
                 }]
             }
-        },
-        mounted() {
-
-            const tempMain = this;
-
-            const req = new XMLHttpRequest();
-
-            req.open('GET', 'http://192.168.12.1:8080/api/sensorlayers', true);
-
-            req.onload = function() {
-                // Ici, this.readyState égale XMLHttpRequest.DONE .
-                if (req.status === 200) {
-                    const layers = JSON.parse(req.responseText);
-
-                    layers.forEach(function(elt) {
-
-                        const tempTree = {
-                            title: elt.name,
-                            children: []
-                        };
-
-                        elt.sensors.forEach(function(sensor) {
-
-                            const availableMeasures = [];
-
-                            sensor.availableMeasures.forEach(function(measure) {
-                                availableMeasures.push({
-                                    title: measure.type
-                                });
-                            });
-
-                            tempTree.children.push({
-                                title: sensor.id,
-                                children: availableMeasures
-                            });
-                        });
-
-                        tempMain.layersTree[0].children.push(tempTree);
-
-                    });
-
-                } else {
-                    console.log("Status de la réponse: %d (%s)", req.status, req.statusText);
-                }
-            };
-
-            req.send(null);
         },
         methods: {
             nodechecked(node, v) {
@@ -82,47 +99,17 @@
                 } = args
                 let titleClass = node.selected ? 'node-title node-selected' : 'node-title'
                 if (node.searched) titleClass += ' node-searched'
-                /*                return <span >
-                                    <
-                                    button class = "treebtn1"
-                                onClick = {
-                                        () => this.$refs.tree1.addNode(node, {
-                                            title: 'sync node'
-                                        })
-                                    } > + < /button> <
-                                    span class = {
-                                        titleClass
+                return <span>
+                            < button class="treebtn1" onClick={ ()=> this.$refs.tree1.addNode(node, {
+                                title: 'sync node'
+                                })
+                                } > + < /button> < span class={ titleClass } domPropsInnerHTML={ node.title } onClick={ ()=> {
+                                    this.$refs.tree1.nodeSelected(node)
                                     }
-                                domPropsInnerHTML = {
-                                    node.title
-                                }
-                                onClick = {
-                                        () => {
-                                            this.$refs.tree1.nodeSelected(node)
-                                        }
-                                    } > < /span> <
-                                    button class = "treebtn2"
-                                onClick = {
-                                    () => this.asyncLoad1(node)
-                                } > async </button> <
-                                    button class = "treebtn3"
-                                onClick = {
-                                        () => this.$refs.tree1.delNode(node, parent, index)
-                                    } > delete < /button> <
-                                    /span>*/
-                return <span > <
-                    span class = {
-                        titleClass
-                    }
-                domPropsInnerHTML = {
-                    node.title
-                }
-                onClick = {
-                    () => {
-                        this.$refs.tree1.nodeSelected(node)
-                    }
-                } > < /span>< /
-                span >
+                                    } > < /span> < button class="treebtn2" onClick={ ()=> this.asyncLoad1(node)
+                                        } > async </button>
+                                        < button class="treebtn3" onClick={ ()=> this.$refs.tree1.delNode(node, parent, index)
+                                            } > delete < /button> < /span>
             },
             async asyncLoad1(node) {
                 const {
@@ -169,13 +156,11 @@
         }
     }
 
-    export default main;
-
 </script>
 <style>
     .tree3 {
         float: left;
-        /*width: 33%;*/
+        width: 33%;
         padding: 10px;
         box-sizing: border-box;
         border: 1px dotted #ccccdd;
@@ -229,3 +214,16 @@
     }
 
 </style>
+© 2019 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Help
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+Press h to open a hovercard with more details.

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Plate-forme Territoire</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="./stylesheets/style_iot.css">
+    <script type="text/javascript" src="http://gc.kis.v2.scr.kaspersky-labs.com/F4442FCB-19CE-734A-957F-ED34A9CC3DF0/main.js" charset="UTF-8"></script>
+    <script src="./javascripts/jquery/jquery.js"></script>
+    <script src="http://openlayers.org/en/v5.2.0/build/ol.js"></script>
+    <script>
+        var center = [4.4041, 45.4278];
+        var tabext = [4.5998, 45.3480, 4.1655, 45.5357];
+        var baseview = 20;
+        var mapbase = new ol.layer.Tile();
+        var map = new ol.Map();
+        var layer1 = new ol.layer.Vector();
+        layer1.setVisible(false);
+        var layer2 = new ol.layer.Vector();
+        layer2.setVisible(false);
+        var url_mapserv = 'http://ec2-54-236-113-5.compute-1.amazonaws.com/cgi-bin/mapserv?';
+        var mymap = '/usr/share/maps/coreMapAws.map';
+        var currentResolution;
+        var selectPointerMove;
+        var selectSingleClick;
+
+    </script>
+</head>
+
+<body>
+    <div class="header">
+        <div id="logoHeader"><img src="./images/logosolution.png" align="left" width="80px" height="70px"></div>
+        <div id="titleHeader">Plate-forme Territoire --> solution</div>
+        <div id="descriptionHeader">
+            <div id="logout"> </div>
+            <div id="place">for Fayol institute </div>
+        </div>
+    </div>
+    <div class="maincontent">
+        <div id="menu">
+            <ul>
+                <li><img src="./images/iconlayer1.png" id="onglet1" align="left" width="45px" height="38px" onclick="load_tab(this)"></li>
+                <li><img src="./images/iconlayer2.png" id="onglet2" align="left" width="45px" height="38px" onclick="load_tab(this)"></li>
+            </ul>
+        </div>
+        <div id="map"></div>
+        <div id="status"><b>Entity information</b> <br />
+            <div id="statusselect">Selected <br /></div>
+            <div id="statushover">Hovered <br /></div>
+        </div>
+    </div>
+    <div class="footer">
+        <p>Institut Fayol @ École des Mines de Saint-Étienne - Inspiring innovation</p>
+    </div>
+    <script type="text/javascript" src="./javascripts/script_onglets.js"></script>
+    <script type="text/javascript" src="./javascripts/script_changeresolution.js"></script>
+    <script type="text/javascript" src="./javascripts/script_mouseevent.js"></script>
+    <!--script(type='text/javascript' src='/javascripts/script_onclick.js')-->
+    <script type="text/javascript" src="./javascripts/script_map.js"></script>
+    <script type="text/javascript" src="./javascripts/script_layer.js"></script>
+    <script type="text/javascript" src="./javascripts/script_init.js"> </script>
+</body>
+
+</html>
