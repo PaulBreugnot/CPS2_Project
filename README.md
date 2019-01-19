@@ -5,13 +5,14 @@
 - DONE `emse/fayol/e0/itm/sensors/{id_module}/metrics/LUMI`
 - DONE `emse/fayol/e0/itm/sensors/{id_module}/metrics/HMDT`
 - DONE `emse/fayol/e0/itm/sensors/{id_module}/metrics/TMP`
+- DONE `connected` when a new board is connecting, it sends the new topic available
 - TODO `emse/fayol/e0/itm/sensors/{id_module}/request`
-- TODO `emse/fayol/e0/itm/sensors/{id_module}/answers/{command}`$
+- TODO `emse/fayol/e0/itm/sensors/{id_module}/answers/{command}`
 
 ## Useful commands
 ### Subscribe
 `mosquitto_sub -h ec2-54-236-113-5.compute-1.amazonaws.com -p 1883 -t [topic]`
-####Examples:
+Examples:
 `mosquitto_sub -h ec2-54-236-113-5.compute-1.amazonaws.com -p 1883 -t emse/fayol/e0/itm/sensors/[-1 / -2 / -3]/metrics/[TMP / HDMT / LUMI]`
 - -1 raspberry
 - -2 mkrWIFI1010
@@ -22,11 +23,11 @@
 
 # mkr1010
 ## Connect to wifi 
-- change wifi_ssid
-- change wifi_password
+- change `wifi_ssid`
+- change `wifi_password`
 ## Connect to mqtt_host 
-- change mqtt_host
-- change mqtt_port
+- change `mqtt_host`
+- change `mqtt_port`
 - uncomment mqtt_user & mqtt_password can be needed also in the mqtt_client.connect
 ## choose the topic
 - change `topic`
