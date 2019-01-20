@@ -10,6 +10,7 @@ This guide will present the structure of each component and how to configure the
 - A MapServer, that provides a map display.
 - A Spring Boot app, also embedded in the server, that collect published data through MQTT and store them in the database.
 - A WebApp and its Node.js app to perform map and data display.
+- A static RDF Graph generated using R2RML, accessible from a Fuseki SparQL endpoint.
 
 # Modules
 This section describes how to configure Arduino and RPi in our context. Notice that any system could be used, given that they can publish data using MQTT.
@@ -170,3 +171,35 @@ Using `systemd`, you should have something like
 `ExecStart=/usr/bin/java -jar /your/path/to/dataflow-0.0.1-SNAPSHOT.jar --spring.config.location=file:/absolute/path/to/your/config/example.properties`
 
 in a unit file `/etc/systemd/system/dataflow.service`, for common Linux distributions.
+
+# RDF Graph
+
+We used [R2RML](https://www.w3.org/TR/r2rml/) to generate an RDF graph from our SQL database, thanks to the [r2rml-parser implementation](https://github.com/nkons/r2rml-parser).
+
+Two of our mapping files are available [there](https://github.com/PaulBreugnot/CPS2_Project/tree/master/r2rml/mapping) :
+- `mapping.r2rml` can be seen as the *theoritical* mapping file, that can be used to map the complete graph from all the data.
+- However, in pratice, the `observation` table can be so big that it becomes impossible to parse it directly, so `test.r2rml` is a version that does not generate the graph from the whole `observation` table. You can customize the amount of data used through the `sqlQuery` parameter at **line 203** in the `test.r2rml` file.
+
+## Run r2rml-parser
+
+To learn how to use `r2rml-parser`, please check the [r2rml-parser documentation](https://github.com/nkons/r2rml-parser/wiki/Getting-started).
+
+Once install, set up your PostgreSQL database information, the `mapping.file` and the output parameters in the [r2rml.properties file](https://github.com/nkons/r2rml-parser/blob/master/r2rml.properties).
+
+Finally you can execute the program using, for example :
+`./r2rml-parser.sh -p r2rml.properties` to generate your RDF file.
+
+We provide some [result examples](https://github.com/PaulBreugnot/CPS2_Project/tree/master/r2rml/results) ir RDF/XML and Turtle, for 1000 observations.
+
+## Exploring the graph
+### RDF Validator
+
+You can use the [w3 RDF Validator](https://www.w3.org/RDF/Validator/) to perform some basic graph visualization of the generated RDF/XML.
+
+### Jena Fuseki
+
+To perform SparQL query on the generated graph, we used the Apache Jena Fuseki server. Follow [the documentation](https://jena.apache.org/documentation/fuseki2/) to learn how to set it up in the way you prefer.
+
+Once done, you should be able to import the generated RDF files directly into Fuseki, and perform operations on it through the Fuseki UI.
+
+Notice that we also experimented Fuseki as a service directly on our server, and it seems to work pretty well.
