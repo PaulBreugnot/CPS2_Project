@@ -55,8 +55,8 @@ MQTTClient mqtt_client ;
 
 String topic = "emse/fayol/e0/itm/sensors/-2/metrics/";
 
-const char* wifi_ssid = "Livebox-881E";
-const char* wifi_password = "loulousdedevesset";
+const char* wifi_ssid = "";
+const char* wifi_password = "";
 
 const char* mqtt_host = "ec2-54-236-113-5.compute-1.amazonaws.com" ;
 const uint16_t mqtt_port = 1883;
