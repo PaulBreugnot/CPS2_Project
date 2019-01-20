@@ -99,7 +99,7 @@ Where -1 / -2 / -3 / ... correspond to your module ids. In our case :
 
 A complete description of our database schema can be found (=> insert link <=)[].
 
-PSQL dumps are also available in (=> insert link <=)[] if you want to easily reproduce our structure.
+PSQL dumps are also available in (psql/dumps)[https://github.com/PaulBreugnot/CPS2_Project/tree/master/psql/dumps] if you want to easily reproduce our structure.
 
 ## Host your DB
 
@@ -122,8 +122,15 @@ Check the [PostGIS documentation](https://postgis.net/install/) if you need more
 ## Connect using psql
 `psql -h cps2projectdb.cyppypwyycpk.us-east-1.rds.amazonaws.com -d cps2_project -U cps2_admin`
 
-## Tables declarations
-SQL dumps are available in psql/dumps
+# MapServer
 
-## Doc
-HTML Doc is available in psql/doc
+## Installation
+
+Installing the MapServer can be quite tricky and very platform dependent. However, we currently don't have better source than the [MapServer documentation](https://mapserver.org/introduction.html) to help you!
+
+## Configuration
+
+The MapServer will :
+- Access our PostgreSQL database to retrieve geographical sensor and room informations. The database connection and SQL querries are set up directly in the MapFile. Our example is available [there](https://github.com/PaulBreugnot/CPS2_Project/tree/master/mapserver). You should configure it with your own database information, and store it in a directory accessible by the Apache server that you should have install and run along with the MapServer.
+- The WebApp will access the MapFile through the MapServer thanks to the URL that you should configure [insert where].
+
