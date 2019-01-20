@@ -96,6 +96,29 @@ Where -1 / -2 / -3 / ... correspond to your module ids. In our case :
 `mosquitto_pub -h ec2-54-236-113-5.compute-1.amazonaws.com -p 1883 -t [topic] -m [message]`
 
 # PostgreSQL Database
+
+A complete description of our database schema can be found (=> insert link <=)[].
+
+PSQL dumps are also available in (=> insert link <=)[] if you want to easily reproduce our structure.
+
+## Host your DB
+
+We used (AWS RDS)[https://aws.amazon.com/rds/] to host our database.
+
+However, it is quite simple to host a PostgreSQL database on many systems. Check the documentation relative to your distribution to see how.
+
+### PostGIS
+
+The only extra step is that you need to install and enable the PostGIS module in order to be able to work with geographical data.
+
+To do so, a PostGIS package might be available, depending on your distribution.
+
+Once install, the extension can easily be enable using [pgAdmin](https://www.pgadmin.org/), in the `extensions` menu.
+
+![PGADMIN extension menu](/psql/pgadmin_extensions.png)
+
+Check the [PostGIS documentation](https://postgis.net/install/) if you need more information about how to install PostGIS.
+
 ## Connect using psql
 `psql -h cps2projectdb.cyppypwyycpk.us-east-1.rds.amazonaws.com -d cps2_project -U cps2_admin`
 
