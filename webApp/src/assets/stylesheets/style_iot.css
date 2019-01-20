@@ -134,7 +134,7 @@ div#menu li:hover {
     margin: 0;
     padding: 0;
     float: left;
-    width: 8em;
+    width: 9em;
 }
 
 .column {
@@ -165,9 +165,6 @@ div#menu li:hover {
 section {
     padding-bottom: 1em;
 }
-
-
-
 
 /*! normalize.css v7.0.0 | MIT License | github.com/necolas/normalize.css */
 html {

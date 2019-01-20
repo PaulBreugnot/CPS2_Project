@@ -1,6 +1,7 @@
 <template>
-    <div>
-        <header id="site-header" class="nav is-fixed" style="display: flex;">
+    <div style="top: 0; bottom: 0; left: 0; right: 0; margin:0; padding:0;">
+        <!--header which contains the logos and the navigation items-->
+        <header class="nav is-fixed" style="display: flex;">
             <div class="logos">
                 <div class="column">
                     <a href="https://minbot.fr/">
@@ -36,16 +37,19 @@
         </header>
 
         <main>
+            <!--Section with the description of the project-->
             <section id="section-0">
-                <h3 id="trues2-workshop-context-acquisition-and-representation-in-itm-factory">
-                    S2. Workshop context acquisition and representation in ITM’Factory
-                </h3>
+                <h1 id="trues2-workshop-context-acquisition-and-representation-in-itm-factory">
+                    Workshop context acquisition and representation in ITM’Factory
+                </h1>
                 <div class="paragraph">
                     <p>Definition and selection of set of sensors to acquire environmental data in ITM’Factory.
                         Representation, processing and visualisation of these data will have to take into account the geolocalized position of the sensors as well as the global architecture of the workshop (positioning of machines, workers, etc).
                         Indicators related to the quality of the working conditions in the workshop will be computed from these data. They will be displayed on an Interactive communication platform placed in workshops of the factory.</p>
                 </div>
             </section>
+
+            <!--Section with the map and its controls-->
             <section id="section-1" class="mapContainer">
                 <div class="maincontent">
                     <div id="menu">
@@ -61,7 +65,8 @@
                     </div>
                 </div>
             </section>
-            <br style="clear:both;" />
+
+            <!--Section with the chart and the menu with the sensors-->
             <section id="section-2">
                 <div style="display: flex; position: relative;">
                     <div style="float: left;">
@@ -130,17 +135,30 @@
     import Rickshaw from 'rickshaw'
     import 'rickshaw/rickshaw.min.css'
     import 'bootstrap/dist/css/bootstrap.css'
-    //var socket = io.connect("http://ec2-54-236-113-5.compute-1.amazonaws.com:9001");
-    // Test with : mosquitto_sub -h ec2-54-236-113-5.compute-1.amazonaws.com -p 1883 -t test_topic
-    //var socket = io.connect("http://localhost:3000");
+
+    // The chart
     var magnitudeChart;
 
+    // The MQTT client
     const client = mqtt.connect("ws://ec2-54-236-113-5.compute-1.amazonaws.com:9001");
 
+    // Var for the size of the chart
     var mini;
     var maxi;
 
+    // URL of the web socket
+    const urlWebSocket = 'http://ec2-54-236-113-5.compute-1.amazonaws.com:8090/api/sensorlayers'; 
+
     function HSVtoRGB(h, s, v) {
+        /**
+         * Summary : transform a HSV color triplet into a RGB one. 
+         *
+         * @param   {integer}   h           Hue value in HSV color desciption, must be between 0 and 360.
+         * @param   {float}     s           Saturation value in HSV color desciption, must be between 0 and 1.
+         * @param   {float}     v           Value value in HSV color desciption, must be between 0 and 1.
+         * @return  {object}    {r, g, b }  Triplet of integers for RGB color
+         */
+
         var r, g, b, i, f, p, q, t;
         if (arguments.length === 1) {
             s = h.s, v = h.v, h = h.h;
@@ -178,11 +196,21 @@
     }
 
     function componentToHex(c) {
+        /**
+         * @param   {integer}   c
+         * @return  {string}    value  Translation of c in hex base
+         */
         var hex = c.toString(16);
         return hex.length == 1 ? "0" + hex : hex;
     }
 
     function rgbToHex(r, g, b) {
+        /**
+         * Summary : transform a RGB color triplet into a hex value. 
+         *
+         * @param   {integers}  r,g,b   Triplet of integers between 0 and 255 from RGB color
+         * @return  {string}    hex     Translation of the input in hex base
+         */
         return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
     }
 
@@ -190,6 +218,9 @@
         name: 'graph',
         data() {
             return {
+                /*
+                 * used for mqtt-realtime-chart-client
+                 */
                 messageSeries: [],
                 renderEveryNth: 1,
                 updateInterval: 20,
@@ -202,6 +233,9 @@
                 displayedTopics: [],
                 dvColors: {},
                 lastValue: {},
+                /*
+                 * used for vue-tree
+                 */
                 searchword: '',
                 initSelected: ['Layers'],
                 layersTree: [{
@@ -209,6 +243,9 @@
                     expanded: true,
                     children: []
                 }],
+                /*
+                 * vue-scrollactive
+                 */
                 elements: [],
                 alwaysTrack: false,
                 duration: 600,
@@ -219,13 +256,18 @@
         },
         computed: {
             numberOfElements() {
+                /*
+                 * used for scrollactive
+                 */
                 return this.elements.length;
             },
         },
         mounted() {
 
+            // Trick for having *this* within functions
             const tempMain = this;
 
+            // Used for scrollactive
             this.elements = this.$el.querySelectorAll('.scrollactive-item');
 
             //------------------------------------------------------------------------------------------
@@ -235,13 +277,20 @@
             // script_onglets
 
             function load_tab(elt) {
+                /**
+                 * Summary : load either the sensors layers or the room layers. 
+                 *
+                 * @param   {HTML element}  elt  
+                 */
                 if (elt.id === 'onglet1') {
                     if (layer1.getVisible()) {
                         layer1.setVisible(false);
                         map.removeLayer(layer1);
                     } else {
+                        
+                        console.log(map.getView().getResolution());
+                        
                         if (map.getView().getResolution() > 1) {
-                            // layer1 = createLayerSensorCluster('sensorbase_4');
                             layer1 = createLayerSensorCluster('sensoritm');
                             console.log("Create LayerSensorCluster");
                         } else {
@@ -259,7 +308,6 @@
                         layer2.setVisible(false);
                         map.removeLayer(layer2);
                     } else {
-                        // layer2 = createLayerOffice('office_4');
                         layer2 = createLayerOffice('itm');
                         console.log("Create LayerOffice");
                         map.addLayer(layer2);
@@ -272,6 +320,11 @@
             // script_changeresolution
 
             function map_changeresolution(evt) {
+                /**
+                 * Summary : change the resolution of the map
+                 *
+                 * @param   {event} evt
+                 */
                 var viewResolution = /** @type {number} */ (map.getView().getResolution());
                 if (layer1.getVisible()) {
                     if (viewResolution > 1 && currentResolution <= 1) {
@@ -292,36 +345,12 @@
                 currentResolution = viewResolution;
             }
 
-            // script_mouseevent
-
-            selectPointerMove = new ol.interaction.Select({
-                layers: function(layer) {
-                    return (layer.get('name') === 'sensor' && layer.getVisible());
-                },
-                filter: function(feature, layer) {
-                    return map.getView().getResolution() <= 1;
-                },
-                condition: ol.events.condition.pointerMove,
-                style: [new ol.style.Style({
-                    image: new ol.style.RegularShape({
-                        fill: new ol.style.Fill({
-                            color: 'rgba(220,20,60,0.6)'
-                        }),
-                        stroke: new ol.style.Stroke({
-                            color: 'rgba(220,20,60,1.0)',
-                            width: 3
-                        }),
-                        points: 3,
-                        radius: 14,
-                        rotation: Math.PI / 4,
-                        angle: 0
-                    })
-                })]
-            });
-
             // script_onclick
 
             function map_onclick(evt) {
+                /**
+                 * Summary : reacts to a click on the map
+                 */
                 var features = new Array();
                 if (map.getView().getResolution() <= 1) {
                     map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
@@ -341,6 +370,12 @@
             // script_map
 
             function createMapBase(spec) {
+                /**
+                 * Summary : create the desired map according to the spec
+                 *
+                 * @param   {string}            spec    A string which define the type of map wanted
+                 * @return  {ol.layer.Tile}     map     The map
+                 */
                 if (spec == 'mapboxLight') {
                     return new ol.layer.Tile({
                         source: new ol.source.XYZ({
@@ -393,9 +428,6 @@
                         new ol.control.OverviewMap()
                     ]),
                     layers: [elt_base],
-                    /*interactions: ol.interaction.defaults({
-                       dragPan: false
-                       }),*/
                     view: new ol.View({
                         projection: 'EPSG:3857',
                         center: valcenter,
@@ -406,11 +438,37 @@
                         minZoom: minZ,
                         maxZoom: maxZ,
                         extent: valextent,
-                        //[5.28796, 43.37792, 5.53023, 43.2234],
                     }),
                 });
                 return map;
             }
+
+            // script_mouseevent
+
+            selectPointerMove = new ol.interaction.Select({
+                layers: function(layer) {
+                    return (layer.get('name') === 'sensor' && layer.getVisible());
+                },
+                filter: function(feature, layer) {
+                    return map.getView().getResolution() <= 1;
+                },
+                condition: ol.events.condition.pointerMove,
+                style: [new ol.style.Style({
+                    image: new ol.style.RegularShape({
+                        fill: new ol.style.Fill({
+                            color: 'rgba(220,20,60,0.6)'
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: 'rgba(220,20,60,1.0)',
+                            width: 3
+                        }),
+                        points: 3,
+                        radius: 14,
+                        rotation: Math.PI / 4,
+                        angle: 0
+                    })
+                })]
+            });
 
             selectSingleClick = new ol.interaction.Select({
                 layers: function(layer) {
@@ -431,6 +489,7 @@
                 })]
             });
 
+            // When hovering over a sensor
             selectPointerMove.on('select', function(e) {
                 var tabfeatures = e.target.getFeatures();
 
@@ -448,6 +507,7 @@
                 $('#statushover').html(texthtml);
             });
 
+            // When click on a room
             selectSingleClick.on('select', function(e) {
                 var tabfeatures = e.target.getFeatures();
 
@@ -546,6 +606,9 @@
             }
 
             function createLayerSensor(table) {
+                /**
+                 * Summary : create the layer for 
+                 */
                 var formatSensor = new ol.format.GML2({
                     featureType: "Sensorbase",
                     featureNS: "http://mapserver.gis.umn.edu/mapserver",
@@ -585,7 +648,6 @@
                     format: formatSensor
                 });
 
-
                 var sensorL = new ol.layer.Vector({
                     source: sensor,
                     style: [new ol.style.Style({
@@ -611,6 +673,9 @@
             }
 
             function createLayerOffice(table) {
+                /**
+                 * Summary : create the layer for the rooms
+                 */
                 var formatOffice = new ol.format.GML2({
                     featureType: "Office",
                     featureNS: "http://mapserver.gis.umn.edu/mapserver",
@@ -721,10 +786,10 @@
 
             client.on("connect", function() {
 
+                // 
                 const req = new XMLHttpRequest();
 
-                /*req.open('GET', 'http://192.168.12.1:8080/api/sensorlayers', true);*/
-                req.open('GET', 'http://ec2-54-236-113-5.compute-1.amazonaws.com:8090/api/sensorlayers', true);
+                req.open('GET', urlWebSocket, true);
 
                 function onLoad() {
                     // Ici, this.readyState égale XMLHttpRequest.DONE .
