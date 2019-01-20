@@ -200,7 +200,7 @@
 <#Observation>
 		rr:logicalTable [
 			# rr:tableName "observation"
-			rr:sqlQuery "SELECT * FROM observation WHERE id < 20;"
+			rr:sqlQuery "SELECT * FROM observation LIMIT 100;"
 		];
 
 		rr:subjectMap [
