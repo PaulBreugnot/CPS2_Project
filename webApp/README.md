@@ -24,21 +24,19 @@ Before you run the client, be sure you have these downloaded/installed on your m
 + npm
 + [the current project](https://github.com/PaulBreugnot/CPS_Project)
 
+### Configuration
+
+Your mapServer host URL and your mapFile path **on your server** (e.g. : `/usr/share/maps/mapFile.map`) must be configure in the [`index.html` file](https://github.com/PaulBreugnot/CPS2_Project/blob/master/webApp/index.html) using the dedicated fields.
+
 ### Installing
 
-To get started with this project, follow the 2-step installation, described here.
+To run the web app :
 
-## 1. Web application* *\(this repo)\*
+1. Open a new terminal window and navigate to the root folder of the web application.
 
-Open a new terminal window and navigate inside the root folder of the web application, then run:
+2. execute `npm install`
 
-```
-npm install
-```
-
-```
-npm start
-```
+3. execute `npm start`
 
 After compilation, you will see the link in the terminal *(e.g. http://localhost:8081)* where the application is currently running. Use your browser to navigate to that link. 
 
