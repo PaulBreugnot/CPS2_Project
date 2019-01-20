@@ -200,7 +200,7 @@
 <#Observation>
 		rr:logicalTable [
 			# rr:tableName "observation"
-			rr:sqlQuery "SELECT * FROM observation LIMIT 100;"
+			rr:sqlQuery "SELECT * FROM (SELECT * FROM observation LIMIT 1000) AS limited_obs;"
 		];
 
 		rr:subjectMap [
