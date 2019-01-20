@@ -14,7 +14,6 @@ body {
 }
 
 .maincontent {
-    top: 3em;
     position: relative;
     min-width: 1000px;
     padding: 0;
@@ -33,6 +32,15 @@ footer {
 
 .logo {
     height: calc(3em - 2px);
+}
+
+main {
+    position: relative;
+    padding-top: 3em;
+}
+
+.subject {
+    position: relative;
 }
 
 header {
@@ -120,10 +128,41 @@ div#menu li:hover {
     font-size: 1.5em;
 }
 
-.row {
+.logos {
     display: flex;
     margin: 0;
     padding: 0;
+    float: left;
+    width: 7.5em;
+}
+
+.column {
+    float: left;
+    text-align: left;
+}
+
+.nav {
+    float: right;
+    width: 100%;
+    height: auto;
+    display: flex;
+}
+
+.sub-menu-left {
+    width: 50%;
+    margin-left: 0;
+    float: left
+}
+
+.sub-menu-right {
+    width: 50%;
+    margin-right: 0;
+    float: right;
+    vertical-align: middle;
+}
+
+section {
+    padding-bottom: 1em;
 }
 
 

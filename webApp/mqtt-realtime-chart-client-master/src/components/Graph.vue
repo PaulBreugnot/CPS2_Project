@@ -1,7 +1,7 @@
 <template>
     <div>
         <header id="site-header" class="nav is-fixed" style="display: flex;">
-            <div style="display: left;" class="row">
+            <div class="logos">
                 <div class="column">
                     <a href="https://minbot.fr/">
                         <img class="logo" src="../assets/logo-pixled.png" alt="Pixled" title="Pixled">
@@ -9,21 +9,43 @@
                 </div>
                 <div class="column">
                     <a href="/">
-                    <img class="logo" src="../assets/logo-emse.png" alt="EMSE" title="EMSE">
+                        <img class="logo" src="../assets/logo-emse.png" alt="EMSE" title="EMSE">
                     </a>
                 </div>
             </div>
             <br style="clear:both;" />
-            <div class="container" style="display: right;">
-                <scrollactive ref="scrollactive" :offset="offset" :always-track="alwaysTrack" :duration="duration" :click-to-scroll="clickToScroll" :bezier-easing-value="easing">
-                    <ul class="nav-center">
-                        <li><a href="#section-1" class="scrollactive-item nav-item">Map</a></li>
-                        <li><a href="#section-2" class="scrollactive-item nav-item">Graph</a></li>
+            <nav class="nav">
+                <div class="sub-menu-left" style="float: left;">
+                    <scrollactive ref="scrollactive" :offset="offset" :always-track="alwaysTrack" :duration="duration" :click-to-scroll="clickToScroll" :bezier-easing-value="easing">
+                        <ul class="nav-left">
+                            <li><a href="#section-0" class="scrollactive-item nav-item">Subject</a></li>
+                            <li><a href="#section-1" class="scrollactive-item nav-item">Map</a></li>
+                            <li><a href="#section-2" class="scrollactive-item nav-item">Graph</a></li>
+                        </ul>
+                    </scrollactive>
+                </div>
+                <br style="clear:both;" />
+                <div class="sub-menu-right" style="float: right;">
+                    <ul class="nav-right">
+                        <li class="nav-item"><button id="mapboxDark">Map Dark</button></li>
+                        <li class="nav-item"><button id="mapboxLight">Map Light</button></li>
+                        <li class="nav-item"><button id="mapboxStreets">Map Streets</button></li>
                     </ul>
-                </scrollactive>
-            </div>
+                </div>
+            </nav>
         </header>
+
         <main>
+            <section id="section-0">
+                <h3 id="trues2-workshop-context-acquisition-and-representation-in-itm-factory">
+                    S2. Workshop context acquisition and representation in ITM’Factory
+                </h3>
+                <div class="paragraph">
+                    <p>Definition and selection of set of sensors to acquire environmental data in ITM’Factory.
+                        Representation, processing and visualisation of these data will have to take into account the geolocalized position of the sensors as well as the global architecture of the workshop (positioning of machines, workers, etc).
+                        Indicators related to the quality of the working conditions in the workshop will be computed from these data. They will be displayed on an Interactive communication platform placed in workshops of the factory.</p>
+                </div>
+            </section>
             <section id="section-1" class="mapContainer">
                 <div class="maincontent">
                     <div id="menu">
@@ -41,7 +63,7 @@
             </section>
             <br style="clear:both;" />
             <section id="section-2">
-                <div style="top: 3em; display: flex; position: relative;">
+                <div style="display: flex; position: relative;">
                     <div style="float: left;">
                         <div class="tree3">
                             <input class="tree-search-input" type="text" v-model="searchword" placeholder="search..." />
@@ -70,7 +92,7 @@
                                             <!-- End of chart container -->
                                         </div>
                                         <div class="panel-footer">
-                                            <p v-if="displayedTopics.length > 0">
+                                            <p v-if="displayedTopics.length > 0 && displayedValues.length > 0">
                                                 <span v-for="topic in displayedTopics">
                                                     <span v-bind:style="{ color: dvColors[topic]}"> {{displayedValues[0][topic]}} {{measures[topics.indexOf(topic)]}} / </span>
                                                 </span>
@@ -95,6 +117,7 @@
                 </div>
             </section>
         </main>
+
         <footer>
             <p>Institut Fayol @ École des Mines de Saint-Étienne - Inspiring innovation</p>
         </footer>
@@ -205,83 +228,6 @@
 
             this.elements = this.$el.querySelectorAll('.scrollactive-item');
 
-            client.on("connect", function() {
-
-                const req = new XMLHttpRequest();
-
-                /*req.open('GET', 'http://192.168.12.1:8080/api/sensorlayers', true);*/
-                req.open('GET', 'http://ec2-54-236-113-5.compute-1.amazonaws.com:8090/api/sensorlayers', true);
-
-                function onLoad() {
-                    // Ici, this.readyState égale XMLHttpRequest.DONE .
-                    if (req.status === 200) {
-                        const layers = JSON.parse(req.responseText);
-
-                        layers.forEach(function(layer) {
-
-                            const tempTree = {
-                                title: layer.name,
-                                id: "emse/fayol/e0/" + layer.name.replace('sensor', ''),
-                                children: []
-                            };
-
-                            layer.sensors.forEach(function(sensor) {
-
-                                const availableMeasures = []
-
-                                const topic = sensor.topic ? sensor.topic : "emse/fayol/e0/itm/sensors/" + sensor.id
-
-                                sensor.availableMeasures.forEach(function(measure) {
-
-                                    availableMeasures.push({
-                                        title: measure.type,
-                                        id: topic + "/metrics/" + measure.type
-                                    });
-
-                                    client.subscribe(topic + "/metrics/" + measure.type, function(err) {
-                                        if (err) {
-                                            console.log(err);
-                                        }
-                                    });
-
-                                    tempMain.measures.push(measure.unit);
-                                    tempMain.topics.push(topic + "/metrics/" + measure.type);
-                                    tempMain.displayedTopics.push(topic + "/metrics/" + measure.type);
-                                });
-
-                                tempTree.children.push({
-                                    title: sensor.name ? sensor.name : sensor.id,
-                                    id: topic,
-                                    children: availableMeasures
-                                });
-                            });
-
-                            tempMain.layersTree[0].children.push(tempTree);
-
-                        });
-
-                        let index = 0;
-
-                        tempMain.topics.forEach(function(elt) {
-                            const color = HSVtoRGB(index / tempMain.topics.length, 1, 0.63);
-                            tempMain.dvColors[elt] = rgbToHex(color.r, color.g, color.b);
-                            index++;
-                        });
-
-                        tempMain.initChart();
-                        tempMain.openSocketListeners();
-
-                    } else {
-                        console.log("Status de la réponse: %d (%s)", req.status, req.statusText);
-                        setTimeout(onLoad, 5000);
-                    }
-                };
-
-                req.onload = onLoad();
-
-                req.send(null);
-            });
-
             //------------------------------------------------------------------------------------------
             // Script map
             //------------------------------------------------------------------------------------------
@@ -322,16 +268,6 @@
                     return;
                 }
             }
-
-            const onglet1 = document.getElementById("onglet1");
-            const onglet2 = document.getElementById("onglet2");
-
-            onglet1.onclick = function() {
-                load_tab(onglet1);
-            };
-            onglet2.onclick = function() {
-                load_tab(onglet2);
-            };
 
             // script_changeresolution
 
@@ -497,8 +433,15 @@
 
             selectPointerMove.on('select', function(e) {
                 var tabfeatures = e.target.getFeatures();
+
+                console.log(tabfeatures);
+                console.log(tabfeatures.getArray());
+
                 var texthtml = 'Hovered <br />';
                 tabfeatures.forEach(function(f) {
+
+                    console.log(f);
+
                     texthtml += 'id: ' + f.get('id') + ' -- ';
                     texthtml += 'base size: ' + f.get('capacity') + '<br />';
                 });
@@ -507,6 +450,9 @@
 
             selectSingleClick.on('select', function(e) {
                 var tabfeatures = e.target.getFeatures();
+
+                console.log(tabfeatures);
+
                 var texthtml = 'Selected <br />';
                 tabfeatures.forEach(function(f) {
                     texthtml += 'id: ' + f.get('id') + ' -- ';
@@ -733,13 +679,123 @@
 
                 currentResolution = map.getView().getResolution();
                 map.getView().on('change:resolution', map_changeresolution);
-                // map.on('singleclick',map_onclick);
                 map.addInteraction(selectPointerMove);
                 map.addInteraction(selectSingleClick);
-
-                //map.overlayContainerStopEvent.hidden = true;
-
             });
+
+            // button interaction
+
+            function loadMap(elt) {
+                $("#map").empty();
+                mapbase = createMapBase(elt.id);
+                map = createMap(mapbase, 'map', center, tabext, baseview);
+
+                map.overlayContainerStopEvent_.hidden = true;
+
+                currentResolution = map.getView().getResolution();
+                map.getView().on('change:resolution', map_changeresolution);
+                map.addInteraction(selectPointerMove);
+                map.addInteraction(selectSingleClick);
+            }
+
+            $('#mapboxDark').click(function() {
+                loadMap(this)
+            });
+            $('#mapboxLight').click(function() {
+                loadMap(this)
+            });
+            $('#mapboxStreets').click(function() {
+                loadMap(this)
+            });
+
+            $('#onglet1').click(function() {
+                load_tab(this)
+            });
+            $('#onglet2').click(function() {
+                load_tab(this)
+            });
+
+            //------------------------------------------------------------------------------------------
+            // Connection to client
+            //------------------------------------------------------------------------------------------
+
+            client.on("connect", function() {
+
+                const req = new XMLHttpRequest();
+
+                /*req.open('GET', 'http://192.168.12.1:8080/api/sensorlayers', true);*/
+                req.open('GET', 'http://ec2-54-236-113-5.compute-1.amazonaws.com:8090/api/sensorlayers', true);
+
+                function onLoad() {
+                    // Ici, this.readyState égale XMLHttpRequest.DONE .
+                    if (req.status === 200) {
+                        const layers = JSON.parse(req.responseText);
+
+                        layers.forEach(function(layer) {
+
+                            const tempTree = {
+                                title: layer.name,
+                                id: "emse/fayol/e0/" + layer.name.replace('sensor', ''),
+                                children: []
+                            };
+
+                            layer.sensors.forEach(function(sensor) {
+
+                                const availableMeasures = []
+
+                                const topic = sensor.topic ? sensor.topic : "emse/fayol/e0/itm/sensors/" + sensor.id
+
+                                sensor.availableMeasures.forEach(function(measure) {
+
+                                    availableMeasures.push({
+                                        title: measure.type,
+                                        id: topic + "/metrics/" + measure.type
+                                    });
+
+                                    client.subscribe(topic + "/metrics/" + measure.type, function(err) {
+                                        if (err) {
+                                            console.log(err);
+                                        }
+                                    });
+
+                                    tempMain.measures.push(measure.unit);
+                                    tempMain.topics.push(topic + "/metrics/" + measure.type);
+                                    tempMain.displayedTopics.push(topic + "/metrics/" + measure.type);
+                                });
+
+                                tempTree.children.push({
+                                    title: sensor.name ? sensor.name : sensor.id,
+                                    id: topic,
+                                    children: availableMeasures
+                                });
+                            });
+
+                            tempMain.layersTree[0].children.push(tempTree);
+
+                        });
+
+                        let index = 0;
+
+                        tempMain.topics.forEach(function(elt) {
+                            const color = HSVtoRGB(index / tempMain.topics.length, 1, 0.63);
+                            tempMain.dvColors[elt] = rgbToHex(color.r, color.g, color.b);
+                            index++;
+                        });
+
+                        tempMain.initChart();
+                        tempMain.openSocketListeners();
+
+                    } else {
+                        console.log("Status de la réponse: %d (%s)", req.status, req.statusText);
+                        setTimeout(onLoad, 5000);
+                    }
+                };
+
+                req.onload = onLoad();
+
+                req.send(null);
+            });
+
         },
         watch: {
             renderEveryNth: function() {
@@ -820,12 +876,18 @@
 
                 this.resizeChart(magnitudeChart);
 
-                window.addEventListener('resize', () => {
-                    this.resizeChart(magnitudeChart)
-                });
+                const tempThis = this;
+
+                window.onresize = function() {
+                    tempThis.resizeChart(magnitudeChart)
+                };
 
             },
             resizeChart(chart) {
+
+                console.log(document.getElementById("graphContainer"));
+                //console.clear();
+
                 chart.configure({
                     width: this.$refs.panel.clientWidth ? this.$refs.panel.clientWidth : document.getElementById("graphContainer").clientWidth,
                 });
