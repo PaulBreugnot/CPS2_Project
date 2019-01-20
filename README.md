@@ -10,6 +10,7 @@ This guide will present the structure of each component and how to configure the
 - A MapServer, that provides a map display.
 - A Spring Boot app, also embedded in the server, that collect published data through MQTT and store them in the database.
 - A WebApp and its Node.js app to perform map and data display.
+- A static RDF Graph generated using R2RML, accessible from a Fuseki SparQL endpoint.
 
 # Modules
 This section describes how to configure Arduino and RPi in our context. Notice that any system could be used, given that they can publish data using MQTT.
@@ -99,7 +100,7 @@ Where -1 / -2 / -3 / ... correspond to your module ids. In our case :
 
 A complete description of our database schema can be found (=> insert link <=)[].
 
-PSQL dumps are also available in (psql/dumps)[https://github.com/PaulBreugnot/CPS2_Project/tree/master/psql/dumps] if you want to easily reproduce our structure.
+PSQL dumps are also available in [psql/dumps](https://github.com/PaulBreugnot/CPS2_Project/tree/master/psql/dumps) if you want to easily reproduce our structure.
 
 ## Host your DB
 
@@ -134,3 +135,71 @@ The MapServer will :
 - Access our PostgreSQL database to retrieve geographical sensor and room informations. The database connection and SQL querries are set up directly in the MapFile. Our example is available [there](https://github.com/PaulBreugnot/CPS2_Project/tree/master/mapserver). You should configure it with your own database information, and store it in a directory accessible by the Apache server that you should have install and run along with the MapServer.
 - The WebApp will access the MapFile through the MapServer thanks to the URL that you should configure [insert where].
 
+# Spring Boot Dataflow
+We developed a Spring Boot application, called **dataflow**, that can :
+- Subscribe to data topics
+- Structure all informations received on topics, and save them directly to the PostgreSQL database
+- Provide lists of available rooms and sensors over a REST API (useful for our WebApp)
+
+## Install and configure
+A compiled .jar is available [there](https://github.com/PaulBreugnot/CPS2_Project/tree/master/dataflow/release).
+
+The app can then be configured using a Spring property file. An example is available [there](https://github.com/PaulBreugnot/CPS2_Project/tree/master/dataflow/release/example.properties)
+
+### Note
+- If several instance of the app are running, don't forget to modify the `mqttconnection.client_id` for each instance, otherwise the client won't connect to the MQTT broker.
+- You might change the `server.port` used for the REST API, in case it is already used.
+
+You can then lauch a Dataflow instance using :
+`java -jar dataflow-0.0.1-SNAPSHOT.jar --spring.config.location=file:/absolute/path/to/your/config/example.properties`
+
+## Usage
+- Data gathering and database feeding is completely automatic, once configured.
+- You can perform the following GET queries :
+  - `http://your.dataflow.host:8090/api/sensorlayers` : all sensor layers with associated sensors
+  - `http://your.dataflow.host:8090/api/sensors` : get all available sensors
+  - `http://your.dataflow.host:8090/api/sensors?layer=[id]` : get sensors in the specified sensor layer.
+
+All outputs are returned in JSON.
+  
+## Dataflow as a Service
+In order to run it on a server, it can be useful to run Dataflow as a service.
+You can do so following [this tutorial](https://www.baeldung.com/spring-boot-app-as-a-service).
+
+Using `systemd`, you should have something like
+
+`ExecStart=/usr/bin/java -jar /your/path/to/dataflow-0.0.1-SNAPSHOT.jar --spring.config.location=file:/absolute/path/to/your/config/example.properties`
+
+in a unit file `/etc/systemd/system/dataflow.service`, for common Linux distributions.
+
+# RDF Graph
+
+We used [R2RML](https://www.w3.org/TR/r2rml/) to generate an RDF graph from our SQL database, thanks to the [r2rml-parser implementation](https://github.com/nkons/r2rml-parser).
+
+Two of our mapping files are available [there](https://github.com/PaulBreugnot/CPS2_Project/tree/master/r2rml/mapping) :
+- `mapping.r2rml` can be seen as the *theoritical* mapping file, that can be used to map the complete graph from all the data.
+- However, in pratice, the `observation` table can be so big that it becomes impossible to parse it directly, so `test.r2rml` is a version that does not generate the graph from the whole `observation` table. You can customize the amount of data used through the `sqlQuery` parameter at **line 203** in the `test.r2rml` file.
+
+## Run r2rml-parser
+
+To learn how to use `r2rml-parser`, please check the [r2rml-parser documentation](https://github.com/nkons/r2rml-parser/wiki/Getting-started).
+
+Once install, set up your PostgreSQL database information, the `mapping.file` and the output parameters in the [r2rml.properties file](https://github.com/nkons/r2rml-parser/blob/master/r2rml.properties).
+
+Finally you can execute the program using, for example :
+`./r2rml-parser.sh -p r2rml.properties` to generate your RDF file.
+
+We provide some [result examples](https://github.com/PaulBreugnot/CPS2_Project/tree/master/r2rml/results) ir RDF/XML and Turtle, for 1000 observations.
+
+## Exploring the graph
+### RDF Validator
+
+You can use the [w3 RDF Validator](https://www.w3.org/RDF/Validator/) to perform some basic graph visualization of the generated RDF/XML.
+
+### Jena Fuseki
+
+To perform SparQL query on the generated graph, we used the Apache Jena Fuseki server. Follow [the documentation](https://jena.apache.org/documentation/fuseki2/) to learn how to set it up in the way you prefer.
+
+Once done, you should be able to import the generated RDF files directly into Fuseki, and perform operations on it through the Fuseki UI.
+
+Notice that we also experimented Fuseki as a service directly on our server, and it seems to work pretty well.
