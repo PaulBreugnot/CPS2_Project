@@ -1,3 +1,24 @@
+Skip to content
+Why GitHub?
+Enterprise
+Explore
+Marketplace
+Pricing
+
+Search
+
+Sign in
+Sign up
+24 610 139 halower/vue-tree
+Code Issues 14 Pull requests 0 Projects 0 Insights
+Join GitHub today
+GitHub is home to over 28 million developers working together to host and review code, manage projects, and build software together.
+
+vue-tree/demo/src/components/HelloWorld.vue
+992186a on 17 Oct 2018
+@CosSalt CosSalt [dev]
+
+167 lines (164 sloc) 4.5 KB
 <template>
     <div>
         <div class="tree3">
@@ -5,14 +26,18 @@
             <button class=" tree-search-btn" type="button" @click="search">search</button>
             <v-tree ref='tree1' :canDeleteRoot="true" :data='treeData1' :draggable='true' :tpl='tpl' :halfcheck='true' :multiple="true" />
         </div>
-        <!--    <div class="tree3"><v-tree ref="tree2" :data='treeData2' :multiple='false' @node-check='nodechecked' @async-load-nodes='asyncLoad2'/></div>
-    <div class="tree3"> <v-select-tree :data='treeData3' v-model='initSelected' :multiple="true"/></div>-->
+        <div class="tree3">
+            <v-tree ref="tree2" :data='treeData2' :multiple='false' @node-check='nodechecked' @async-load-nodes='asyncLoad2' />
+        </div>
+        <div class="tree3">
+            <v-select-tree :data='treeData3' v-model='initSelected' :multiple="true" />
+        </div>
     </div>
 </template>
 
 <script>
     export default {
-        name: 'MenuScrolling',
+        name: 'HelloWorld',
         data() {
             return {
                 searchword: '',
@@ -44,7 +69,6 @@
                     expanded: false,
                     async: true
                 }],
-
                 treeData3: [{
                     title: 'node1',
                     expanded: true,
@@ -75,58 +99,17 @@
                 } = args
                 let titleClass = node.selected ? 'node-title node-selected' : 'node-title'
                 if (node.searched) titleClass += ' node-searched'
-/*                return <span >
-                    <
-                    button class = "treebtn1"
-                onClick = {
-                        () => this.$refs.tree1.addNode(node, {
-                            title: 'sync node'
-                        })
-                    } > + < /button> <
-                    span class = {
-                        titleClass
-                    }
-                domPropsInnerHTML = {
-                    node.title
-                }
-                onClick = {
-                        () => {
-                            this.$refs.tree1.nodeSelected(node)
-                        }
-                    } > < /span> <
-                    button class = "treebtn2"
-                onClick = {
-                    () => this.asyncLoad1(node)
-                } > async </button> <
-                    button class = "treebtn3"
-                onClick = {
-                        () => this.$refs.tree1.delNode(node, parent, index)
-                    } > delete < /button> <
-                    /span>*/
-                return <span >
-                    <
-                    button class = "treebtn1"
-                onClick = {
-                        () => this.$refs.tree1.addNode(node, {
-                            title: 'sync node'
-                        })
-                    } > + < /button> <
-                    span class = {
-                        titleClass
-                    }
-                domPropsInnerHTML = {
-                    node.title
-                }
-                onClick = {
-                        () => {
-                            this.$refs.tree1.nodeSelected(node)
-                        }
-                    } > < /span><
-                    button class = "treebtn3"
-                onClick = {
-                        () => this.$refs.tree1.delNode(node, parent, index)
-                    } > delete < /button> <
-                    /span>
+                return <span>
+                            < button class="treebtn1" onClick={ ()=> this.$refs.tree1.addNode(node, {
+                                title: 'sync node'
+                                })
+                                } > + < /button> < span class={ titleClass } domPropsInnerHTML={ node.title } onClick={ ()=> {
+                                    this.$refs.tree1.nodeSelected(node)
+                                    }
+                                    } > < /span> < button class="treebtn2" onClick={ ()=> this.asyncLoad1(node)
+                                        } > async </button>
+                                        < button class="treebtn3" onClick={ ()=> this.$refs.tree1.delNode(node, parent, index)
+                                            } > delete < /button> < /span>
             },
             async asyncLoad1(node) {
                 const {
@@ -177,7 +160,7 @@
 <style>
     .tree3 {
         float: left;
-        /*width: 33%;*/
+        width: 33%;
         padding: 10px;
         box-sizing: border-box;
         border: 1px dotted #ccccdd;
@@ -231,3 +214,16 @@
     }
 
 </style>
+© 2019 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Help
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+Press h to open a hovercard with more details.

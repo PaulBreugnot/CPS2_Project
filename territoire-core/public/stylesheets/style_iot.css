@@ -1,17 +1,20 @@
-html{   
+article {   
     margin: 0;
     padding: 0;
     min-width: 1000px;    
     overflow-y: auto;
     overflow-x: auto;
+    background-color:rgb(235,235,235);
+    display: flex;
+    position: relative;
 }
 
-body{    
+/*body{    
     margin: 0;
     padding: 0;
     min-width: 1000px;    
     background-color:rgb(235,235,235);
-}
+}*/
 
 .header {
     width: 100%;
