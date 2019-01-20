@@ -7,7 +7,6 @@ import emse.cps2project.dataflow.model.observation.dao.ObservationDao;
 import emse.cps2project.dataflow.model.sensor.Sensor;
 import emse.cps2project.dataflow.model.sensor.dao.SensorDao;
 import emse.cps2project.dataflow.mqtt.topic.DataTopic;
-import emse.cps2project.dataflow.tdb.TdbConnectionImpl;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.slf4j.Logger;
@@ -19,8 +18,6 @@ import java.util.Date;
 
 @Component
 public class MqttConnectionHandler implements IMqttMessageListener {
-
-    private static int int_test = 0;
 
     Logger logger = LoggerFactory.getLogger(MqttConnectionHandler.class);
 
@@ -55,7 +52,7 @@ public class MqttConnectionHandler implements IMqttMessageListener {
                 measureType.getObservations().add(observation);
                 sensor.getObservations().add(observation);
 
-                observationDao.save(observation);
+                // observationDao.save(observation);
             }
             else {
                 logger.error("Unknown Sensor : " + dataTopic.getIdSensor());

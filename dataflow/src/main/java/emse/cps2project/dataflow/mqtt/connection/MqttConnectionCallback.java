@@ -1,6 +1,5 @@
 package emse.cps2project.dataflow.mqtt.connection;
 
-import emse.cps2project.dataflow.DataflowApplicationConfig;
 import org.eclipse.paho.client.mqttv3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,9 @@ public class MqttConnectionCallback implements MqttCallbackExtended {
         try {
              // client.subscribe(MqttConnection.connected_topic, 1, mqttConnectionHandler);
              // client.subscribe(MqttConnection.disconnected_topic, 1, mqttConnectionHandler);
-            client.subscribe(MqttConnection.data_topic, 1, mqttConnectionHandler);
+            logger.info("Subscribing to data topic : " + mqttConnection.getDataTopic());
+            client.subscribe(mqttConnection.getDataTopic(), 1, mqttConnectionHandler);
+            logger.info("Subscribed.");
         } catch (MqttException e) {
             e.printStackTrace();
         }
