@@ -4,8 +4,6 @@ import Vue from 'vue'
 import Graph from './Graph'
 import router from './router'
 
-import MenuScrolling from './MenuScrolling.vue'
-
 import VueScrollactive from 'vue-scrollactive'
 
 import 'vue-tree-halower/dist/halower-tree.min.css'

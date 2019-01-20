@@ -134,6 +134,7 @@
     import Rickshaw from 'rickshaw'
     import 'rickshaw/rickshaw.min.css'
     import 'bootstrap/dist/css/bootstrap.css'
+    import Keycloak from 'keycloak-js'
 
     // The chart
     var magnitudeChart;
@@ -232,6 +233,7 @@
                 displayedTopics: [],
                 dvColors: {},
                 lastValue: {},
+                receivingMessages: false,
                 /*
                  * used for vue-tree
                  */
@@ -262,6 +264,44 @@
             },
         },
         mounted() {
+
+            /*            const keycloak = Keycloak({
+                            realm: "master",
+                            authServerUrl: "http://localhost:8080/auth",
+                            clientId: 'pixled'
+                        });
+
+                        var loadData = function() {
+
+                            var url = 'http://localhost:8080/restful-service';
+
+                            var req = new XMLHttpRequest();
+                            req.open('GET', url, true);
+                            req.setRequestHeader('Accept', 'application/json');
+                            req.setRequestHeader('Authorization', 'Bearer ' + keycloak.token);
+
+                            req.onreadystatechange = function() {
+                                if (req.readyState == 4) {
+                                    if (req.status == 200) {
+                                        alert('Success');
+                                    } else if (req.status == 403) {
+                                        alert('Forbidden');
+                                    }
+                                }
+                            }
+
+                            req.send();
+                        };
+
+                        keycloak.init({
+                            onLoad: 'login-required'
+                        });
+
+                        keycloak.updateToken(30).success(function() {
+                            loadData();
+                        }).error(function() {
+                            alert('Failed to refresh token');
+                        });*/
 
             // Trick for having *this* within functions
             const tempMain = this;
@@ -891,9 +931,8 @@
                 } = args;
                 let titleClass = node.selected ? 'node-title node-selected' : 'node-title';
                 if (node.searched) titleClass += ' node-searched';
-                return <span > <
-                    span
-                class = {
+
+                const result = < span > < span class = {
                     titleClass
                 }
                 domPropsInnerHTML = {
@@ -904,8 +943,9 @@
                         this.$refs.tree1.nodeSelected(node);
                         this.updateDisplayedTopics();
                     }
-                } > < /span>< /
-                span >
+                } > < /span>< /span > ;
+
+                return result;
             },
             search() {
                 // Search for a node. Does not work right now
@@ -1036,7 +1076,7 @@
                 };
             },
             openSocketListeners() {
-                
+
                 client.on("connect", () => {
                     this.connStatus = "Connected";
                 });
@@ -1053,36 +1093,37 @@
                         const messageReceived = new TextDecoder("utf-8").decode(payload);
                         try {
                             this.lastValue[topic] = parseFloat(messageReceived);
+
+                            if (!this.receivingMessages) {
+
+                                // Gather all messages received during the next 500ms
+                                setTimeout(() => {
+
+                                    // Check if displayed values have to be updated
+                                    this.updateDisplayedValues();
+
+                                    // Push stream data to current series, if it's not yet render-time
+                                    if (this.messageSeries.length < this.renderEveryNth) {
+                                        this.messageSeries.push(this.lastValue);
+
+                                    }
+
+                                    // Render-time!
+                                    if (this.messageSeries.length == this.renderEveryNth) {
+                                        this.insertDatapoints(this.messageSeries, magnitudeChart);
+                                        this.messageSeries = [];
+                                    }
+
+                                    this.lastValue = {};
+                                    this.receivingMessages = !this.receivingMessages;
+                                }, 500)
+                            }
+
                         } catch (err) {
                             console.log(err);
                         }
                     }
                 });
-
-                // Every 2s, gather all data received during 500ms and display them at one
-                setInterval(() => {
-                    if (Object.keys(this.lastValue).length) {
-                        setTimeout(() => {
-
-                            // Check if displayed values have to be updated
-                            this.updateDisplayedValues();
-
-                            // Push stream data to current series, if it's not yet render-time
-                            if (this.messageSeries.length < this.renderEveryNth) {
-                                this.messageSeries.push(this.lastValue);
-
-                            }
-
-                            // Render-time!
-                            if (this.messageSeries.length == this.renderEveryNth) {
-                                this.insertDatapoints(this.messageSeries, magnitudeChart);
-                                this.messageSeries = [];
-                            }
-
-                            this.lastValue = {};
-                        }, 500)
-                    }
-                }, 2000)
 
             }
         },
