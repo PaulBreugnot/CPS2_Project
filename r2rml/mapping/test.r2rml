@@ -1,0 +1,241 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix geo: <http://opengis.net/ont/geosparql#>.
+@prefix bot: <https://w3id.org/bot#>.
+@prefix sosa: <http://www.w3.org/ns/sosa/>.
+@prefix ssn: <http://www.w3.org/ns/ssn/>.
+
+################################################################################
+# ROOM DEFINITION
+################################################################################
+<#RoomLayer>
+	rr:logicalTable [ rr:tableName "room_layer"];
+
+	rr:subjectMap [
+		rr:template "http://example.com/#cps2_project/room_layer/{id}";
+		rr:class bot:Zone
+	];
+	rr:predicateObjectMap [
+		rr:predicate rdfs:label;
+		rr:objectMap [ rr:column "name" ]
+	];
+
+	rr:predicateObjectMap [
+		rr:predicate bot:hasSpace;
+		rr:objectMap [
+			rr:parentTriplesMap <#Room>;
+			rr:joinCondition [
+				rr:child "id";
+				rr:parent "id_layer";
+			]
+		]
+	].
+
+<#RoomGeometries>
+	rr:logicalTable [
+		rr:sqlQuery "SELECT id, ST_asText(geom) as geom_wkt from room;"
+	];
+
+	rr:subjectMap [
+		rr:template "http://example.com/cps2_project#room/geometry/{id}";
+		rr:class geo:Geometry
+	];
+
+	rr:predicateObjectMap [
+		rr:predicate geo:hasSerialization;
+		rr:objectMap [ rr:column "geom_wkt"; rr:datatype geo:wktLiteral ]
+	].
+
+<#Room>
+		rr:logicalTable [ rr:tableName "room" ];
+
+		rr:subjectMap [
+			rr:template "http://example.com/cps2_project#room/{id}";
+			rr:class bot:Space, geo:Feature
+		];
+
+		rr:predicateObjectMap [
+			rr:predicate geo:hasGeometry;
+			rr:object <http://example.com/cps2_project#room/geometry/{id}>
+		];
+
+		rr:predicateObjectMap [
+			rr:predicate rdfs:label;
+			rr:objectMap [ rr:column "refoffice" ]
+		].
+
+################################################################################
+# SENSOR DEFINITION
+################################################################################
+
+<#SensorLayer>
+		rr:logicalTable [ rr:tableName "sensor_layer"];
+
+		rr:subjectMap [
+			rr:template "http://example.com/#cps2_project/sensor_layer/{id}";
+			rr:class sosa:Platform
+		];
+		rr:predicateObjectMap [
+			rr:predicate rdfs:label;
+			rr:objectMap [ rr:column "name" ]
+		];
+
+		rr:predicateObjectMap [
+			rr:predicate sosa:hosts;
+			rr:objectMap [
+				rr:parentTriplesMap <#Sensor>;
+				rr:joinCondition [
+					rr:child "id";
+					rr:parent "id_layer";
+				]
+			]
+		].
+
+<#SensorGeometries>
+		rr:logicalTable [
+			rr:sqlQuery "SELECT id, ST_asText(geom) as geom_wkt from sensor;"
+		];
+
+		rr:subjectMap [
+			rr:template "http://example.com/cps2_project#sensor/geometry/{id}";
+			rr:class geo:Geometry
+		];
+
+	rr:predicateObjectMap [
+		rr:predicate geo:hasSerialization;
+		rr:objectMap [ rr:column "geom_wkt"; rr:datatype geo:wktLiteral ]
+	].
+
+<#Sensor>
+		rr:logicalTable [ rr:tableName "sensor" ];
+		rr:subjectMap [
+			rr:template "http://example.com/cps2_project#sensor/{id}";
+			rr:class sosa:Sensor, geo:Feature
+		];
+
+		rr:predicateObjectMap [
+			rr:predicate geo:hasGeometry;
+			rr:object <http://example.com/cps2_project#sensor/geometry/{id}>
+		];
+
+		rr:predicateObjectMap [
+			rr:predicate rdfs:label;
+			rr:objectMap [ rr:column "name" ]
+		];
+
+		rr:predicateObjectMap [
+			rr:predicate sosa:observes;
+			rr:objectMap [
+				rr:parentTriplesMap <#MeasureType>;
+				rr:joinCondition [
+					rr:child "id";
+					rr:parent "id_sensor";
+				]
+			]
+		];
+
+		rr:predicateObjectMap [
+			rr:predicate sosa:isHostedBy;
+			rr:objectMap [
+				rr:parentTriplesMap <#SensorLayer>;
+				rr:joinCondition [
+					rr:child "id_layer";
+					rr:parent "id";
+				]
+			]
+		];
+
+		rr:predicateObjectMap [
+			rr:predicate sosa:madeObservation;
+			rr:objectMap [
+				rr:parentTriplesMap <#Observation>;
+				rr:joinCondition [
+					rr:child "id";
+					rr:parent "id_sensor";
+				]
+			]
+		].
+
+################################################################################
+# MEASURE DEFINITION
+################################################################################
+
+<#MeasureType>
+		rr:logicalTable [
+			rr:sqlQuery "select sensor_available_measures.id as availability_id, type, unit, id_sensor, id_measure_type from measure_type as measuretype join sensor_available_measures on measuretype.id = sensor_available_measures.id_measure_type;"
+			# rr:tableName "measure_type"
+		];
+
+		rr:subjectMap [
+			rr:template "http://example.com/cps2_project#measuretype/{id_measure_type}";
+			rr:class ssn:ObservableProperty
+		];
+
+		rr:predicateObjectMap [
+			rr:predicate rdf:type;
+			rr:objectMap [ rr:column "type"]
+		];
+
+		rr:predicateObjectMap [
+			rr:predicate rdfs:label;
+			rr:objectMap [ rr:column "unit" ]
+		];
+
+		rr:predicateObjectMap [
+			rr:predicate sosa:isObservedBy;
+			rr:objectMap [
+				rr:parentTriplesMap <#Sensor>;
+				rr:joinCondition [
+					rr:child "id_sensor";
+					rr:parent "id";
+				]
+			]
+		].
+
+################################################################################
+# OBSERVATIONS DEFINITION
+################################################################################
+
+<#Observation>
+		rr:logicalTable [
+			# rr:tableName "observation"
+			rr:sqlQuery "SELECT * FROM (SELECT * FROM observation LIMIT 1000) AS limited_obs;"
+		];
+
+		rr:subjectMap [
+			rr:template "http://example.com/cps2_project#observation/{id}";
+			rr:class sosa:Observation
+		];
+
+		rr:predicateObjectMap [
+			rr:predicate sosa:timeResult;
+			rr:objectMap [ rr:column "timestamp"]
+		];
+
+		rr:predicateObjectMap [
+			rr:predicate sosa:hasSimpleResult;
+			rr:objectMap [rr:column "value"]
+		];
+
+		rr:predicateObjectMap [
+			rr:predicate sosa:madeBySensor;
+			rr:objectMap [
+				rr:parentTriplesMap <#Sensor>;
+				rr:joinCondition [
+					rr:child "id_sensor";
+					rr:parent "id";
+				]
+			]
+		];
+
+		rr:predicateObjectMap [
+			rr:predicate sosa:observedProperty;
+			rr:objectMap [
+				rr:parentTriplesMap <#MeasureType>;
+				rr:joinCondition [
+					rr:child "id_measure_type";
+					rr:parent "id_measure_type";
+				]
+			]
+		].
