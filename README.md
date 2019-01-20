@@ -99,7 +99,7 @@ Where -1 / -2 / -3 / ... correspond to your module ids. In our case :
 
 A complete description of our database schema can be found (=> insert link <=)[].
 
-PSQL dumps are also available in (psql/dumps)[https://github.com/PaulBreugnot/CPS2_Project/tree/master/psql/dumps] if you want to easily reproduce our structure.
+PSQL dumps are also available in [psql/dumps](https://github.com/PaulBreugnot/CPS2_Project/tree/master/psql/dumps) if you want to easily reproduce our structure.
 
 ## Host your DB
 
@@ -134,3 +134,39 @@ The MapServer will :
 - Access our PostgreSQL database to retrieve geographical sensor and room informations. The database connection and SQL querries are set up directly in the MapFile. Our example is available [there](https://github.com/PaulBreugnot/CPS2_Project/tree/master/mapserver). You should configure it with your own database information, and store it in a directory accessible by the Apache server that you should have install and run along with the MapServer.
 - The WebApp will access the MapFile through the MapServer thanks to the URL that you should configure [insert where].
 
+# Spring Boot Dataflow
+We developed a Spring Boot application, called **dataflow**, that can :
+- Subscribe to data topics
+- Structure all informations received on topics, and save them directly to the PostgreSQL database
+- Provide lists of available rooms and sensors over a REST API (useful for our WebApp)
+
+## Install and configure
+A compiled .jar is available [there](https://github.com/PaulBreugnot/CPS2_Project/tree/master/dataflow/release).
+
+The app can then be configured using a Spring property file. An example is available [there](https://github.com/PaulBreugnot/CPS2_Project/tree/master/dataflow/release/example.properties)
+
+### Note
+- If several instance of the app are running, don't forget to modify the `mqttconnection.client_id` for each instance, otherwise the client won't connect to the MQTT broker.
+- You might change the `server.port` used for the REST API, in case it is already used.
+
+You can then lauch a Dataflow instance using :
+`java -jar dataflow-0.0.1-SNAPSHOT.jar --spring.config.location=file:/absolute/path/to/your/config/example.properties`
+
+## Usage
+- Data gathering and database feeding is completely automatic, once configured.
+- You can perform the following GET queries :
+  - `http://your.dataflow.host:8090/api/sensorlayers` : all sensor layers with associated sensors
+  - `http://your.dataflow.host:8090/api/sensors` : get all available sensors
+  - `http://your.dataflow.host:8090/api/sensors?layer=[id]` : get sensors in the specified sensor layer.
+
+All outputs are returned in JSON.
+  
+## Dataflow as a Service
+In order to run it on a server, it can be useful to run Dataflow as a service.
+You can do so following [this tutorial](https://www.baeldung.com/spring-boot-app-as-a-service).
+
+Using `systemd`, you should have something like
+
+`ExecStart=/usr/bin/java -jar /your/path/to/dataflow-0.0.1-SNAPSHOT.jar --spring.config.location=file:/absolute/path/to/your/config/example.properties`
+
+in a unit file `/etc/systemd/system/dataflow.service`, for common Linux distributions.
