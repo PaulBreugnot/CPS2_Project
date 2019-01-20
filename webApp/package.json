@@ -1,12 +1,11 @@
 {
-    "name": "vue-mqtt-realtime-chart",
+    "name": "pixled",
     "version": "0.0.1",
-    "description": "High-frequency real-time data visualization.",
-    "author": "Nick Jokic",
+    "description": "CPS2 project",
+    "author": "Nicolas LAGAILLARDIE",
     "private": true,
     "scripts": {
         "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
-        "prod": "webpack-prod-server --inline --progress --config build/webpack.prod.conf.js",
         "start": "npm run dev",
         "lint": "eslint --ext .js,.vue src",
         "build": "node build/build.js"
