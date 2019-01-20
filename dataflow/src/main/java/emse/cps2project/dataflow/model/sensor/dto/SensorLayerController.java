@@ -7,6 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @CrossOrigin
 @RequestMapping("/api/sensorlayers")
@@ -15,6 +18,14 @@ public class SensorLayerController {
 
     @Autowired
     private SensorLayerDao sensorLayerDao;
+
+    @GetMapping
+    public List<SensorLayerDto> getLayers() {
+        return sensorLayerDao.findAll()
+                .stream()
+                .map(SensorLayerDto::new)
+                .collect(Collectors.toList());
+    }
 
     @GetMapping(path = "/{id}")
     public SensorLayerDto getLayer(@PathVariable("id") Integer idLayer) {

@@ -2,6 +2,7 @@ package emse.cps2project.dataflow.mqtt.connection;
 
 import emse.cps2project.dataflow.DataflowApplicationConfig;
 import org.eclipse.paho.client.mqttv3.*;
+import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ public class MqttConnectionImpl implements MqttConnection {
     Logger logger = LoggerFactory.getLogger(MqttConnectionImpl.class);
 
     private IMqttClient client;
-    private static final String clientId = "DataFlowApp";
+    private static final String clientId = "DataFlowAppTest";
 
     @Autowired
     private MqttConnectionHandler mqttConnectionHandler;
@@ -25,7 +26,7 @@ public class MqttConnectionImpl implements MqttConnection {
     public void connect() {
         logger.info("Connecting to mqtt broker...");
         try {
-            client = new MqttClient("tcp://ec2-54-236-113-5.compute-1.amazonaws.com:1883", clientId);
+            client = new MqttClient(BROKER_URL, clientId, new MqttDefaultFilePersistence("/usr/share/dataflow/mqtt"));
             MqttConnectOptions options = new MqttConnectOptions();
             options.setAutomaticReconnect(true);
             options.setCleanSession(true);

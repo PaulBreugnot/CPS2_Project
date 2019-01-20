@@ -1,6 +1,5 @@
 package emse.cps2project.dataflow.mqtt.connection;
 
-import emse.cps2project.dataflow.DataflowApplicationConfig;
 import emse.cps2project.dataflow.model.measure.MeasureType;
 import emse.cps2project.dataflow.model.measure.dao.MeasureTypeDao;
 import emse.cps2project.dataflow.model.observation.Observation;
@@ -8,6 +7,7 @@ import emse.cps2project.dataflow.model.observation.dao.ObservationDao;
 import emse.cps2project.dataflow.model.sensor.Sensor;
 import emse.cps2project.dataflow.model.sensor.dao.SensorDao;
 import emse.cps2project.dataflow.mqtt.topic.DataTopic;
+import emse.cps2project.dataflow.tdb.TdbConnectionImpl;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.slf4j.Logger;
@@ -15,11 +15,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Component
 public class MqttConnectionHandler implements IMqttMessageListener {
+
+    private static int int_test = 0;
 
     Logger logger = LoggerFactory.getLogger(MqttConnectionHandler.class);
 
@@ -53,13 +54,7 @@ public class MqttConnectionHandler implements IMqttMessageListener {
                 );
                 measureType.getObservations().add(observation);
                 sensor.getObservations().add(observation);
-//                try {
-//                    measureTypeDao.save(measureType);
-//                }
-//                catch (Exception e) {
-//                    logger.error(e.toString());
-//                }
-                // sensorDao.save(sensor);
+
                 observationDao.save(observation);
             }
             else {

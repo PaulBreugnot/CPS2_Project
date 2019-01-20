@@ -2,6 +2,9 @@ package emse.cps2project.dataflow.mqtt.connection;
 
 public interface MqttConnection {
 
+    String BROKER_URL = "tcp://ec2-54-236-113-5.compute-1.amazonaws.com:1883";
+    // String BROKER_URL = "tcp://localhost:1883";
+
     String connected_topic = "/connected";
     String disconnected_topic = "/disconnected";
 
@@ -9,6 +12,4 @@ public interface MqttConnection {
 
     void connect();
     // void checkConnectedModule();
-    // void publishColor(long buildingId, long roomId, long lightId, String color);
-    // void publishSwitch(long buildingId, long roomId, long lightId, Status status);
 }
