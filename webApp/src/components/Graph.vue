@@ -131,7 +131,6 @@
 </template>
 
 <script>
-    import io from 'socket.io-client'
     import Rickshaw from 'rickshaw'
     import 'rickshaw/rickshaw.min.css'
     import 'bootstrap/dist/css/bootstrap.css'
@@ -147,7 +146,7 @@
     var maxi;
 
     // URL of the web socket
-    const urlWebSocket = 'http://ec2-54-236-113-5.compute-1.amazonaws.com:8090/api/sensorlayers'; 
+    const urlWebSocket = 'http://ec2-54-236-113-5.compute-1.amazonaws.com:8090/api/sensorlayers';
 
     function HSVtoRGB(h, s, v) {
         /**
@@ -287,9 +286,9 @@
                         layer1.setVisible(false);
                         map.removeLayer(layer1);
                     } else {
-                        
+
                         console.log(map.getView().getResolution());
-                        
+
                         if (map.getView().getResolution() > 1) {
                             layer1 = createLayerSensorCluster('sensoritm');
                             console.log("Create LayerSensorCluster");
@@ -786,18 +785,19 @@
 
             client.on("connect", function() {
 
-                // 
+                // Use a XMLHttp request for getting the layers, theirs sensors and the related topic
                 const req = new XMLHttpRequest();
 
                 req.open('GET', urlWebSocket, true);
 
                 function onLoad() {
-                    // Ici, this.readyState égale XMLHttpRequest.DONE .
                     if (req.status === 200) {
+                        // Store the answer, which contain all the information
                         const layers = JSON.parse(req.responseText);
 
                         layers.forEach(function(layer) {
 
+                            // Create a new branch for each layer on the vue-tree
                             const tempTree = {
                                 title: layer.name,
                                 id: "emse/fayol/e0/" + layer.name.replace('sensor', ''),
@@ -806,28 +806,36 @@
 
                             layer.sensors.forEach(function(sensor) {
 
+                                // Store all the availabe measures and add it to the children of the sensor within the tree
                                 const availableMeasures = []
 
+                                // Some sensors don't have a topic right now
                                 const topic = sensor.topic ? sensor.topic : "emse/fayol/e0/itm/sensors/" + sensor.id
 
                                 sensor.availableMeasures.forEach(function(measure) {
 
+                                    // Store the availabe measures
                                     availableMeasures.push({
                                         title: measure.type,
                                         id: topic + "/metrics/" + measure.type
                                     });
 
+                                    // Subscribe to the topic
                                     client.subscribe(topic + "/metrics/" + measure.type, function(err) {
                                         if (err) {
                                             console.log(err);
                                         }
                                     });
 
+                                    // Store the unites, the topics
                                     tempMain.measures.push(measure.unit);
                                     tempMain.topics.push(topic + "/metrics/" + measure.type);
+
+                                    // Because we want to show every values available at the start
                                     tempMain.displayedTopics.push(topic + "/metrics/" + measure.type);
                                 });
 
+                                // Add the sensor and it measures as a child of the layer tree 
                                 tempTree.children.push({
                                     title: sensor.name ? sensor.name : sensor.id,
                                     id: topic,
@@ -841,12 +849,14 @@
 
                         let index = 0;
 
+                        // Create and add the gradient of colors
                         tempMain.topics.forEach(function(elt) {
                             const color = HSVtoRGB(index / tempMain.topics.length, 1, 0.63);
                             tempMain.dvColors[elt] = rgbToHex(color.r, color.g, color.b);
                             index++;
                         });
 
+                        // Start the chart and the messages receiption
                         tempMain.initChart();
                         tempMain.openSocketListeners();
 
@@ -870,7 +880,7 @@
         },
         methods: {
             nodechecked(node, v) {
-                alert('that a node-check envent ...' + node.title + v)
+                console.log('that a node-check envent ...' + node.title + v)
             },
             // tpl (node, ctx, parent, index, props) {
             tpl(...args) {
@@ -898,11 +908,13 @@
                 span >
             },
             search() {
+                // Search for a node. Does not work right now
                 this.$refs.tree1.searchNodes(this.searchword)
             },
             /* Rickshaw.js initialization */
             initChart() {
 
+                // Create the list of all data available according to the topics and assign a color for each topic
                 let listSeries = [];
 
                 for (var i = 0; i < this.topics.length; i++) {
@@ -951,7 +963,6 @@
             resizeChart(chart) {
 
                 console.log(document.getElementById("graphContainer"));
-                //console.clear();
 
                 chart.configure({
                     width: this.$refs.panel.clientWidth ? this.$refs.panel.clientWidth : document.getElementById("graphContainer").clientWidth,
@@ -1012,7 +1023,6 @@
                     }
                 });
             },
-            /* Update displayed values every second on average */
             updateDisplayedValues() {
                 this.displayedValues = this.messageSeries;
                 if (this.messageIndex == this.streamFrequency) {
@@ -1026,39 +1036,7 @@
                 };
             },
             openSocketListeners() {
-                /*
-                socket.on('connect', () => {
-                    this.connStatus = "Connected";
-                });
-
-                socket.on('disconnect', () => {
-                    this.connStatus = "Disconnected";
-                });
-                */
-
-                // Update chart after every #renderEveryNth message
-                //socket.on('voltageData', (message) => {
-                /*
-                socket.on('test_topic', (message) => {
-
-                    console.log(message);
-
-                    // Check if displayed values have to be updated
-                    this.updateDisplayedValues();
-
-                    // Push stream data to current series, if it's not yet render-time
-                    if (this.messageSeries.length < this.renderEveryNth) {
-                        this.messageSeries.push(message);
-                    }
-
-                    // Render-time!
-                    if (this.messageSeries.length == this.renderEveryNth) {
-                        this.insertDatapoints(this.messageSeries, magnitudeChart);
-                        this.messageSeries = [];
-                    }
-                });
-                */
-
+                
                 client.on("connect", () => {
                     this.connStatus = "Connected";
                 });
@@ -1070,6 +1048,7 @@
                 this.connStatus = client.connected ? "Connected" : "Disconnected";
 
                 client.on("message", (topic, payload) => {
+                    // On message, if the topic is one of them to display, add the data
                     if (this.displayedTopics.includes(topic)) {
                         const messageReceived = new TextDecoder("utf-8").decode(payload);
                         try {
@@ -1080,6 +1059,7 @@
                     }
                 });
 
+                // Every 2s, gather all data received during 500ms and display them at one
                 setInterval(() => {
                     if (Object.keys(this.lastValue).length) {
                         setTimeout(() => {
