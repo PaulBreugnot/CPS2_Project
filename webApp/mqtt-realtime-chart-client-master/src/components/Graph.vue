@@ -1143,6 +1143,7 @@
         border: 1px dotted #ccccdd;
         overflow: auto;
         height: 800px;
+        width: 100%;
     }
 
     .treebtn1 {
