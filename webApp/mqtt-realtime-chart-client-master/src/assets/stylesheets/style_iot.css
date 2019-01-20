@@ -28,6 +28,7 @@ footer {
     border-top: solid 1px black;
     text-align: center;
     background: white;
+    z-index: 999;
 }
 
 .logo {
@@ -36,7 +37,7 @@ footer {
 
 main {
     position: relative;
-    padding-top: 3em;
+    top: 4em;
 }
 
 .subject {
@@ -133,7 +134,7 @@ div#menu li:hover {
     margin: 0;
     padding: 0;
     float: left;
-    width: 7.5em;
+    width: 8em;
 }
 
 .column {
