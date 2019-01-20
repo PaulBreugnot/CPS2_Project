@@ -1,0 +1,19 @@
+#
+# MQTT Topics declaration
+#
+
+# A test topic
+topic readwrite test_topic
+
+# ITM Data topics
+topic readwrite emse/fayol/e0/itm/sensors/+/metrics/LUMI
+topic readwrite emse/fayol/e0/itm/sensors/+/metrics/HMDT
+topic readwrite emse/fayol/e0/itm/sensors/+/metrics/TMP
+
+# ITM commands topics
+topic readwrite emse/fayol/e0/itm/sensors/+/request
+topic readwrite emse/fayol/e0/itm/sensors/+/answers/+
+
+# Connection topics
+topic readwrite connected
+topic readwrite disconnected
