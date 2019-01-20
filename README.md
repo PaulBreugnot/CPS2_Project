@@ -203,3 +203,9 @@ To perform SparQL query on the generated graph, we used the Apache Jena Fuseki s
 Once done, you should be able to import the generated RDF files directly into Fuseki, and perform operations on it through the Fuseki UI.
 
 Notice that we also experimented Fuseki as a service directly on our server, and it seems to work pretty well.
+
+# Web App
+
+The Web Application allows you to perform map and data visualization from a web browser.
+
+To see how to configure and run it, check [this repository](https://github.com/PaulBreugnot/CPS2_Project/tree/master/webApp).
