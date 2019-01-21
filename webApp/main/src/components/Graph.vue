@@ -1052,36 +1052,39 @@
                     // On message, if the topic is one of them to display, add the data
                     if (this.displayedTopics.includes(topic)) {
                         const messageReceived = new TextDecoder("utf-8").decode(payload);
-                        try {
-                            this.lastValue[topic] = parseFloat(messageReceived);
 
-                            if (!this.receivingMessages) {
+                        this.lastValue[topic] = parseFloat(messageReceived);
 
-                                // Gather all messages received during the next 500ms
-                                setTimeout(() => {
+                        console.log(this.receivingMessages);
 
-                                    // Check if displayed values have to be updated
-                                    this.updateDisplayedValues();
+                        if (!this.receivingMessages) {
 
-                                    // Push stream data to current series, if it's not yet render-time
-                                    if (this.messageSeries.length < this.renderEveryNth) {
-                                        this.messageSeries.push(this.lastValue);
+                            console.log("received message");
 
-                                    }
+                            this.receivingMessages = true;
 
-                                    // Render-time!
-                                    if (this.messageSeries.length == this.renderEveryNth) {
-                                        this.insertDatapoints(this.messageSeries, magnitudeChart);
-                                        this.messageSeries = [];
-                                    }
+                            // Gather all messages received during the next 500ms
+                            setTimeout(() => {
 
-                                    this.lastValue = {};
-                                    this.receivingMessages = !this.receivingMessages;
-                                }, 500)
-                            }
+                                console.log("Process message");
 
-                        } catch (err) {
-                            console.log(err);
+                                // Check if displayed values have to be updated
+                                this.updateDisplayedValues();
+
+                                // Push stream data to current series, if it's not yet render-time
+                                if (this.messageSeries.length < this.renderEveryNth) {
+                                    this.messageSeries.push(this.lastValue);
+                                }
+
+                                // Render-time!
+                                if (this.messageSeries.length == this.renderEveryNth) {
+                                    this.insertDatapoints(this.messageSeries, magnitudeChart);
+                                    this.messageSeries = [];
+                                }
+
+                                this.lastValue = {};
+                                this.receivingMessages = false;
+                            }, 500);
                         }
                     }
                 });
