@@ -52,7 +52,7 @@ public class MqttConnectionHandler implements IMqttMessageListener {
                 measureType.getObservations().add(observation);
                 sensor.getObservations().add(observation);
 
-                // observationDao.save(observation);
+                observationDao.save(observation);
             }
             else {
                 logger.error("Unknown Sensor : " + dataTopic.getIdSensor());

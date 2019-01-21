@@ -49,7 +49,7 @@ This section describes how to configure Arduino and RPi in our context. Notice t
 
 # MQTT Broker
 ## Installation
-Mosquitto allow us to easily setup an MQTT broker. This tool is available for a lot of distribution. You can find the one that fits your needs on the (mosquitto website)[https://mosquitto.org/download/].
+Mosquitto allow us to easily setup an MQTT broker. This tool is available for a lot of distribution. You can find the one that fits your needs on the [mosquitto website](https://mosquitto.org/download/).
 
 ## Mosquitto as a service
 Because we want to launch it on a server, it is better to launch mosquitto *as a service*, to be able to launch mosquitto at boot for example, and have a better logs management.
@@ -59,7 +59,7 @@ With this setup, mosquitto can be configured with the `/etc/mosquitto/mosquitto.
 
 Available topics can also be configured in a `/etc/mosquitto/mosquitto.acl` file.
 
-Find our configuration files and more explanations about it (=> insert link <=)[].
+Find our configuration files and more explanations about it [in the mqtt folder](https://github.com/PaulBreugnot/CPS2_Project/tree/master/mqtt).
 
 ### Run mosquitto
 
@@ -203,3 +203,9 @@ To perform SparQL query on the generated graph, we used the Apache Jena Fuseki s
 Once done, you should be able to import the generated RDF files directly into Fuseki, and perform operations on it through the Fuseki UI.
 
 Notice that we also experimented Fuseki as a service directly on our server, and it seems to work pretty well.
+
+# Web App
+
+The Web Application allows you to perform map and data visualization from a web browser.
+
+To see how to configure and run it, check [this repository](https://github.com/PaulBreugnot/CPS2_Project/tree/master/webApp).
