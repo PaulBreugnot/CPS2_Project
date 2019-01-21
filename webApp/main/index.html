@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>Pixled</title>
+    <link rel="icon" href="/src/assets/favicon.png" />
+
+    <link rel="stylesheet" href="./public/stylesheets/style_iot.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.2/css/bulma.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script src="http://openlayers.org/en/v5.2.0/build/ol.js"></script>
+    <script>
+        var center = [4.4041, 45.4278];
+        var tabext = [4.5998, 45.3480, 4.1655, 45.5357];
+        var baseview = 20;
+        var mapbase = new ol.layer.Tile();
+        var map = new ol.Map();
+        var layer1 = new ol.layer.Vector();
+        layer1.setVisible(false);
+        var layer2 = new ol.layer.Vector();
+        layer2.setVisible(false);
+        var url_mapserv = 'http://ec2-54-236-113-5.compute-1.amazonaws.com/cgi-bin/mapserv?';
+        var mymap = '/usr/share/maps/coreMapAws.map';
+        var currentResolution;
+        var selectPointerMove;
+        var selectSingleClick;
+
+    </script>
+</head>
+
+<body>
+    <noscript>
+        <strong>We're sorry but demo doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+
+    <div id="graph" style="top: 0; bottom: 0; left: 0; right: 0;"></div>
+</body>
+
+</html>
