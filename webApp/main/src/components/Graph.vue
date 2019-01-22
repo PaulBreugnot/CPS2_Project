@@ -139,14 +139,14 @@
     var magnitudeChart;
 
     // The MQTT client
-    const client = mqtt.connect("ws://ec2-54-236-113-5.compute-1.amazonaws.com:9001");
+    const client = mqtt.connect("ws://the/url/of/your/mqtt/broker");
 
     // Var for the size of the chart
     var mini;
     var maxi;
 
     // URL of the web socket
-    const urlWebSocket = 'http://ec2-54-236-113-5.compute-1.amazonaws.com:8090/api/sensorlayers';
+    const urlWebSocket = 'http://the/url/of/your/web/socket';
 
     function HSVtoRGB(h, s, v) {
         /**
