@@ -1,15 +1,24 @@
-<!DOCTYPE html>
-<html lang="en-US">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
+
+<html prefix="dc: http://purl.org/dc/elements/1.1/" lang="en">
 
 <head>
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta property="dc:creator" content="Nicolas Lagaillardie" />
 
+<!--See https://www.w3schools.com/tags/tag_base.asp-->
+<!--   <base href="http://ec2-54-236-113-5.compute-1.amazonaws.com/" target="_blank">-->
+   
     <title>Pixled</title>
     <link rel="icon" href="/src/assets/favicon.png" />
 
+    <link rel="profile" href="http://www.w3.org/1999/xhtml/vocab" />
     <link rel="stylesheet" href="./public/stylesheets/style_iot.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.2/css/bulma.min.css">
+    <link rel="foaf:primaryTopic" href="http://ec2-3-80-207-204.compute-1.amazonaws.com:1024" />
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
@@ -33,7 +42,7 @@
     </script>
 </head>
 
-<body>
+<body about="http://ec2-3-80-207-204.compute-1.amazonaws.com:1024">
     <noscript>
         <strong>We're sorry but demo doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>

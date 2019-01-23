@@ -4,13 +4,18 @@
         <header class="nav is-fixed" style="display: flex;">
             <div class="logos">
                 <div class="column">
-                    <a href="https://minbot.fr/">
+                    <a href="/" property="url">
                         <img class="logo" src="../assets/logo-pixled.png" alt="Pixled" title="Pixled">
                     </a>
                 </div>
                 <div class="column">
-                    <a href="/">
+                    <a href="https://www.mines-stetienne.fr/" property="url">
                         <img class="logo" src="../assets/logo-emse.png" alt="EMSE" title="EMSE">
+                    </a>
+                </div>
+                <div class="column">
+                    <a href="https://minbot.fr/" property="url">
+                        <img class="logo" src="../assets/logo-minbot.jpg" alt="Minbot" title="Minbot">
                     </a>
                 </div>
             </div>
@@ -38,10 +43,16 @@
 
         <main>
             <!--Section with the description of the project-->
-            <section id="/section-0">
-                <h1 id="trues2-workshop-context-acquisition-and-representation-in-itm-factory">
+            <section id="/section-0" xmlns:dc="http://purl.org/dc/elements/1.1/" about="http://www.example.com/books/wikinomics">
+                <h1 id="trues2-workshop-context-acquisition-and-representation-in-itm-factory" property="dc:title">
                     Workshop context acquisition and representation in ITM’Factory
                 </h1>
+                <h2 property="dc:creator">
+                    Ecole des Mines de Saint-Etienne
+                </h2>
+                <span property="dc:date" content="2019-01-19">
+                    January 2019
+                </span>.
                 <div class="paragraph">
                     <p>Definition and selection of set of sensors to acquire environmental data in ITM’Factory.
                         Representation, processing and visualisation of these data will have to take into account the geolocalized position of the sensors as well as the global architecture of the workshop (positioning of machines, workers, etc).
@@ -139,14 +150,14 @@
     var magnitudeChart;
 
     // The MQTT client
-    const client = mqtt.connect("ws://the/url/of/your/mqtt/broker");
+    const client = mqtt.connect("ws://ec2-54-236-113-5.compute-1.amazonaws.com:9001");
 
     // Var for the size of the chart
     var mini;
     var maxi;
 
     // URL of the web socket
-    const urlWebSocket = 'http://the/url/of/your/web/socket';
+    const urlWebSocket = 'http://ec2-54-236-113-5.compute-1.amazonaws.com:8090/api/sensorlayers';
 
     function HSVtoRGB(h, s, v) {
         /**
