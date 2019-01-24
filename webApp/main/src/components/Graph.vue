@@ -1,5 +1,5 @@
 <template>
-    <div style="top: 0; bottom: 0; left: 0; right: 0; margin:0; padding:0;">
+    <div style="top: 0; bottom: 0; left: 0; right: 0; margin:0; padding:0; overflow: hidden;">
         <!--header which contains the logos and the navigation items-->
         <header class="nav is-fixed" style="display: flex;">
             <div class="logos">
@@ -27,6 +27,7 @@
                             <li><a href="#/section-0" class="scrollactive-item nav-item">Subject</a></li>
                             <li><a href="#/section-1" class="scrollactive-item nav-item">Map</a></li>
                             <li><a href="#/section-2" class="scrollactive-item nav-item">Graph</a></li>
+                            <li><a href="#/section-3" class="scrollactive-item nav-item">Fuseki</a></li>
                         </ul>
                     </scrollactive>
                 </div>
@@ -43,7 +44,7 @@
 
         <main>
             <!--Section with the description of the project-->
-            <section id="/section-0" xmlns:dc="http://purl.org/dc/elements/1.1/" about="http://www.example.com/books/wikinomics">
+            <section id="section-0" xmlns:dc="http://purl.org/dc/elements/1.1/" about="http://ec2-3-80-207-204.compute-1.amazonaws.com:1024">
                 <h1 id="trues2-workshop-context-acquisition-and-representation-in-itm-factory" property="dc:title">
                     Workshop context acquisition and representation in ITM’Factory
                 </h1>
@@ -60,8 +61,10 @@
                 </div>
             </section>
 
+            <br style="clear:both;" />
+
             <!--Section with the map and its controls-->
-            <section id="/section-1" class="mapContainer">
+            <section id="section-1" class="mapContainer">
                 <div class="maincontent">
                     <div id="menu">
                         <ul>
@@ -77,8 +80,10 @@
                 </div>
             </section>
 
+            <br style="clear:both;" />
+
             <!--Section with the chart and the menu with the sensors-->
-            <section id="/section-2">
+            <section id="section-2">
                 <div style="display: flex; position: relative;">
                     <div style="float: left;">
                         <div class="tree3">
@@ -132,6 +137,14 @@
                     </div>
                 </div>
             </section>
+
+            <br style="clear:both;" />
+            
+            <section id="section-3">
+                <strong> Fuseki server </strong>
+                <iframe id="fuseki" src="http://ec2-3-87-99-98.compute-1.amazonaws.com:3030/index.html" height="100%" width="100%"> <a src="http://ec2-3-87-99-98.compute-1.amazonaws.com:3030/index.html"> The link to our Fuseki </a></iframe>
+            </section>
+
         </main>
 
         <footer>
@@ -874,7 +887,7 @@
 
                     } else {
                         console.log("Status de la réponse: %d (%s)", req.status, req.statusText);
-                        setTimeout(onLoad, 5000);
+                        /*setTimeout(onLoad, 5000);*/
                     }
                 };
 
